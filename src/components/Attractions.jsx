@@ -106,37 +106,32 @@ const Attractions = () => {
   const { items, exploreImage } = attractionsData[activeCountry];
 
   return (
-    <section className="w-full px-4 py-16">
-      {/* ✅ CLIPPING WRAPPER */}
+    <section className="w-full px-4 py-10 md:py-16">
       <div className="relative max-w-7xl mx-auto rounded-3xl overflow-hidden">
-        {/* Background Image */}
+        {/* Background */}
         <div
-          className="absolute inset-0 rounded-3xl bg-center bg-no-repeat bg-cover"
-          style={{
-            backgroundImage: `url(${attractionsBg})`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backgroundSize: "98% 100%",
-          }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${attractionsBg})` }}
         />
+        <div className="absolute inset-0 bg-black/40" />
 
         {/* Content */}
-        <div className="relative z-10 p-10 text-white bg-gradient-to-r">
-          <h2 className="text-2xl font-semibold mb-6">
+        <div className="relative z-10 p-5 md:p-10 text-white">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6">
             Popular Packages with Great Attractions.
           </h2>
 
-          {/* Tabs */}
-          <div className="flex gap-3 mb-8">
+          {/* Tabs - Scrollable on Mobile */}
+          <div className="flex gap-3 mb-8 overflow-x-auto scrollbar-hide">
             {countries.map((country) => (
               <button
                 key={country}
                 onClick={() => setActiveCountry(country)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition
+                className={`px-5 py-2 whitespace-nowrap rounded-full text-sm font-medium transition
                   ${
                     activeCountry === country
                       ? "bg-black text-white"
-                      : "bg-white text-black hover:bg-gray-200"
+                      : "bg-white text-black"
                   }`}
               >
                 {country}
@@ -144,21 +139,21 @@ const Attractions = () => {
             ))}
           </div>
 
-          {/* Cards */}
+          {/* Cards Section */}
           <div
             key={activeCountry}
-            className="flex gap-6 items-stretch animate-slide-in"
+            className="flex gap-5 md:gap-6 overflow-x-auto md:overflow-visible animate-slide-in scrollbar-hide"
           >
             {items.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-2xl p-3 w-[260px] shadow-lg"
+                className="min-w-[230px] md:min-w-0 md:w-[260px] bg-white rounded-2xl p-3 shadow-lg"
               >
                 <div className="rounded-xl overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="h-[160px] w-full object-cover"
+                    className="h-[150px] md:h-[160px] w-full object-cover"
                   />
                 </div>
 
@@ -169,7 +164,7 @@ const Attractions = () => {
 
                   <div className="flex items-center gap-2">
                     <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
-                      {item.rating}
+                      ⭐{item.rating}
                     </span>
                     <span className="text-xs text-gray-500">
                       {item.reviews}
@@ -180,18 +175,16 @@ const Attractions = () => {
             ))}
 
             {/* Explore Card */}
-            <div className="relative rounded-2xl overflow-hidden w-[260px] shadow-lg">
+            <div className="min-w-[230px] md:w-[260px] relative rounded-2xl overflow-hidden shadow-lg">
               <img
                 src={exploreImage}
                 alt="Explore more"
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 bg-black/50" />
 
-              <div className="relative z-10 p-4 h-full flex flex-col justify-end">
-                <p className="text-sm mb-3">
-                  Explore more packages for popular destinations
-                </p>
+              <div className="relative z-10 p-4 h-full flex flex-col justify-end text-white">
+                <p className="text-sm mb-3">Explore more packages</p>
                 <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg w-fit">
                   Go Now
                 </button>
@@ -201,20 +194,19 @@ const Attractions = () => {
         </div>
       </div>
 
-      {/* ✅ FIXED ANIMATION */}
+      {/* Animation */}
       <style>
         {`
           @keyframes slideIn {
             from {
               opacity: 0;
-              transform: translateX(40px);
+              transform: translateY(40px);
             }
             to {
               opacity: 1;
-              transform: translateX(0);
+              transform: translateY(0);
             }
           }
-
           .animate-slide-in {
             animation: slideIn 0.45s ease-out both;
           }
