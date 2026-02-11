@@ -1,14 +1,31 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [countryOpen, setCountryOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Pages where navbar should NOT be pill-style
   const noPillRoutes = ["/", "/login", "/signup"];
   const isPillNavbar = !noPillRoutes.includes(location.pathname);
+
+  /* ✅ Check Login Status */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedImage = localStorage.getItem("profileImage");
+
+    if (token) {
+      setIsLoggedIn(true);
+      setProfileImage(storedImage || "https://i.pravatar.cc/150");
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [location]);
 
   return (
     <header className="w-full absolute top-4 z-50">
@@ -32,6 +49,7 @@ const Navbar = () => {
 
           {/* RIGHT SECTION */}
           <div className="hidden md:flex items-center gap-6">
+
             {/* Customer Support */}
             <div
               className={`flex items-center gap-2 text-sm font-medium
@@ -46,9 +64,9 @@ const Navbar = () => {
                 <g fill="none">
                   <path
                     fill="#8fbffa"
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M7 1.5a3.25 3.25 0 0 0-3.25 3.25v2.5a.75.75 0 0 1-1.5 0v-2.5A4.75 4.75 0 0 1 7 0h.25A4.75 4.75 0 0 1 12 4.75v5.382c0 .892-.448 1.667-.993 2.198c-.534.521-1.274.92-2.007.92a.75.75 0 0 1 0-1.5c.221 0 .606-.148.96-.493c.341-.334.54-.743.54-1.125V4.75A3.25 3.25 0 0 0 7.25 1.5z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                   <path
                     fill="#2859c5"
@@ -66,24 +84,8 @@ const Navbar = () => {
                 className={`flex items-center gap-1 text-sm font-medium
                   ${isPillNavbar ? "text-gray-700" : "text-white"}`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="#3b92ff"
-                    d="m12.87 15.07l-2.54-2.51l.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35C8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5l3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7l1.62-4.33L19.12 17z"
-                  />
-                </svg>
                 English
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+                <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -100,30 +102,45 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Auth Buttons */}
-            <Link
-              to="/login"
-              className={`px-4 py-1.5 rounded-full border transition
-                ${
-                  isPillNavbar
-                    ? "text-gray-100 hover:text-black bg-blue-600"
-                    : "border-white text-white "
-                }`}
-            >
-              Login
-            </Link>
+            {/* ✅ AUTH BASED RENDERING */}
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  to="/login"
+                  className={`px-4 py-1.5 rounded-full border transition
+                    ${
+                      isPillNavbar
+                        ? "text-gray-100 hover:text-black bg-blue-600"
+                        : "border-white text-white"
+                    }`}
+                >
+                  Login
+                </Link>
 
-            <Link
-              to="/signup"
-              className={`px-4 py-1.5 rounded-full border transition
-                ${
-                  isPillNavbar
-                    ? "text-gray-100 hover:text-black bg-blue-600"
-                    : "border-white text-white"
-                }`}
-            >
-              Sign Up
-            </Link>
+                <Link
+                  to="/signup"
+                  className={`px-4 py-1.5 rounded-full border transition
+                    ${
+                      isPillNavbar
+                        ? "text-gray-100 hover:text-black bg-blue-600"
+                        : "border-white text-white"
+                    }`}
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <div
+                onClick={() => navigate("/user-profile")}
+                className="cursor-pointer"
+              >
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
+                />
+              </div>
+            )}
           </div>
 
           {/* MOBILE HAMBURGER */}
@@ -140,20 +157,34 @@ const Navbar = () => {
         {/* MOBILE MENU */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-3 bg-white rounded-2xl shadow-md p-4 space-y-4">
-            <Link
-              to="/login"
-              className="block text-center py-2 border rounded-full"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="block text-center py-2 bg-blue-600 text-white rounded-full"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Sign Up
-            </Link>
+            {!isLoggedIn ? (
+              <>
+                <Link
+                  to="/login"
+                  className="block text-center py-2 border rounded-full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="block text-center py-2 bg-blue-600 text-white rounded-full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate("/user-profile");
+                }}
+                className="block w-full text-center py-2 bg-blue-600 text-white rounded-full"
+              >
+                My Profile
+              </button>
+            )}
           </div>
         )}
       </div>
