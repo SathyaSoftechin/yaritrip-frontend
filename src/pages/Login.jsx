@@ -50,7 +50,7 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await fetch("http://192.168.1.14:8081/api/auth/login", {
+      const response = await fetch("http://192.168.1.3:8081/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://192.168.1.14:8081/oauth2/authorization/google";
+    window.location.href = "http://192.168.1.3:8081/oauth2/authorization/google";
   };
 
   return (

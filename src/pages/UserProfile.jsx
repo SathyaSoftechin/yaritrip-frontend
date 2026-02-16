@@ -9,43 +9,96 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [profileImage, setProfileImage] = useState(User);
 
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+  });
+
   const tabs = [
     "Personal Information",
-    "Bookings History",
-    "Preferred Language",
+    // "Preferred Language",
+    "Wishlist",
+    "My Bookings",
     "Notifications",
     "Privacy and Policy",
     "Terms and Conditions",
   ];
 
-  /* -------- Load Profile Image from localStorage -------- */
+  /* -------- Load Profile + Image -------- */
   useEffect(() => {
-    const savedImage = localStorage.getItem("profileImage");
-    if (savedImage) {
-      setProfileImage(savedImage);
-    }
-  }, []);
+    const token = localStorage.getItem("token");
 
-  /* -------- Handle Image Upload -------- */
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    fetch("http://192.168.1.3:8081/api/users/me", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        return res.json();
+      })
+      .then((data) => {
+        setProfile({
+          name: data.name,
+          email: data.email,
+          mobile: data.mobile,
+        });
+      })
+      .catch(() => navigate("/"));
+
+    const savedImage = localStorage.getItem("profileImage");
+    if (savedImage) setProfileImage(savedImage);
+  }, [navigate]);
+
+  /* -------- Image Upload -------- */
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const imageURL = URL.createObjectURL(file);
     setProfileImage(imageURL);
-
-    // Save to localStorage (for navbar + refresh persistence)
     localStorage.setItem("profileImage", imageURL);
   };
 
-  /* -------- Logout Function -------- */
+  /* -------- Logout -------- */
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("profileImage");
     navigate("/");
   };
 
-  /* -------- Dummy Booking Data -------- */
+  /* -------- Update Profile -------- */
+  const handleSave = () => {
+    const token = localStorage.getItem("token");
+
+    fetch("http://192.168.1.3:8081/api/users/me", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: profile.name,
+        mobile: profile.mobile,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Update failed");
+        return res.json();
+      })
+      .then(() => alert("Profile updated successfully!"))
+      .catch((err) => console.error(err));
+  };
+
+  /* -------- Dummy Bookings -------- */
   const bookings = [
     {
       id: 1,
@@ -91,7 +144,6 @@ const UserProfile = () => {
               />
             </div>
 
-            {/* Edit Button */}
             <label className="absolute -bottom-2 -right-2 bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full cursor-pointer shadow-md hover:bg-blue-700 transition">
               ✏️ Edit
               <input
@@ -128,18 +180,18 @@ const UserProfile = () => {
               ))}
             </ul>
 
-            {/* Logout */}
             <button
               onClick={handleLogout}
               className="mt-6 w-full py-2 border border-red-400 text-red-500 rounded-xl font-medium hover:bg-red-50 transition"
             >
-              Log Out
+              Log Out ➜]
             </button>
           </div>
 
           {/* Content */}
           <div className="md:col-span-3 bg-white rounded-2xl shadow-md p-6 md:p-8">
-            {/* PERSONAL INFO */}
+
+            {/* Personal Information */}
             {activeTab === "Personal Information" && (
               <>
                 <h2 className="text-xl font-semibold mb-6">
@@ -148,86 +200,94 @@ const UserProfile = () => {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="text-sm text-gray-600">
-                      Full Name
-                    </label>
+                    <label className="text-sm text-gray-600">Full Name</label>
                     <input
                       type="text"
-                      placeholder="Enter your name"
-                      className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={profile.name}
+                      readOnly
+                      className="mt-1 w-full border rounded-lg px-3 py-2"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-600">
-                      Email
-                    </label>
+                    <label className="text-sm text-gray-600">Email</label>
                     <input
                       type="email"
-                      placeholder="Enter your email"
-                      className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={profile.email}
+                      readOnly
+                      className="mt-1 w-full border rounded-lg px-3 py-2"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-600">
-                      Mobile Number
-                    </label>
+                    <label className="text-sm text-gray-600">Mobile Number</label>
                     <input
                       type="text"
-                      placeholder="Enter mobile number"
-                      className="mt-1 w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      value={profile.mobile}
+                      readOnly
+                      className="mt-1 w-full border rounded-lg px-3 py-2"
                     />
                   </div>
                 </div>
 
                 <div className="mt-8 flex justify-end">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition">
+                  <button
+                    onClick={handleSave}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl"
+                  >
                     Save Changes
                   </button>
                 </div>
               </>
             )}
 
-            {/* BOOKINGS HISTORY */}
-            {activeTab === "Bookings History" && (
+            {/* Preferred Language */}
+            {activeTab === "Preferred Language" && (
               <>
                 <h2 className="text-xl font-semibold mb-6">
-                  Your Booking History
+                  Preferred Language
                 </h2>
+                <select className="border px-4 py-2 rounded-lg">
+                  <option>English</option>
+                  <option>Hindi</option>
+                  <option>Telugu</option>
+                  <option>Tamil</option>
+                </select>
+              </>
+            )}
+
+            {/* Wishlist */}
+            {activeTab === "Wishlist" && (
+              <>
+                <h2 className="text-xl font-semibold mb-6">Wishlist</h2>
+                <p className="text-gray-500">
+                  You haven’t added any destinations yet.
+                </p>
+              </>
+            )}
+
+            {/* My Bookings */}
+            {activeTab === "My Bookings" && (
+              <>
+                <h2 className="text-xl font-semibold mb-6">My Bookings</h2>
 
                 <div className="space-y-4">
                   {bookings.map((booking) => (
                     <div
                       key={booking.id}
-                      className="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:shadow-md transition"
+                      className="border rounded-xl p-4 shadow-sm flex justify-between items-center"
                     >
                       <div>
-                        <h3 className="font-semibold text-gray-800">
+                        <h3 className="font-semibold">
                           {booking.destination}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          Travel Date: {booking.date}
+                          {booking.date}
                         </p>
+                        <p className="text-sm mt-1">{booking.status}</p>
                       </div>
-
-                      <div className="flex items-center gap-4">
-                        <span
-                          className={`text-xs px-3 py-1 rounded-full font-medium
-                            ${
-                              booking.status === "Confirmed"
-                                ? "bg-green-100 text-green-600"
-                                : booking.status === "Completed"
-                                ? "bg-blue-100 text-blue-600"
-                                : "bg-red-100 text-red-600"
-                            }`}
-                        >
-                          {booking.status}
-                        </span>
-
-                        <span className="font-semibold">
-                          {booking.amount}
-                        </span>
+                      <div className="font-semibold">
+                        {booking.amount}
                       </div>
                     </div>
                   ))}
@@ -235,13 +295,52 @@ const UserProfile = () => {
               </>
             )}
 
-            {/* Other Tabs */}
-            {activeTab !== "Personal Information" &&
-              activeTab !== "Bookings History" && (
-                <div className="text-gray-500 text-sm">
-                  This section will be configured soon.
+            {/* Notifications */}
+            {activeTab === "Notifications" && (
+              <>
+                <h2 className="text-xl font-semibold mb-6">
+                  Notifications
+                </h2>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span>Email Notifications</span>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                  <div className="flex justify-between">
+                    <span>SMS Alerts</span>
+                    <input type="checkbox" />
+                  </div>
                 </div>
-              )}
+              </>
+            )}
+
+            {/* Privacy */}
+            {activeTab === "Privacy and Policy" && (
+              <>
+                <h2 className="text-xl font-semibold mb-6">
+                  Privacy and Policy
+                </h2>
+                <p className="text-gray-600">
+                  Your privacy is important to us. We ensure secure
+                  handling of all personal and booking information.
+                </p>
+              </>
+            )}
+
+            {/* Terms */}
+            {activeTab === "Terms and Conditions" && (
+              <>
+                <h2 className="text-xl font-semibold mb-6">
+                  Terms and Conditions
+                </h2>
+                <p className="text-gray-600">
+                  By using Yaritrip, you agree to our booking,
+                  cancellation, and refund policies.
+                </p>
+              </>
+            )}
+
           </div>
         </div>
       </div>

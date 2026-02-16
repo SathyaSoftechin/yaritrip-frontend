@@ -109,7 +109,7 @@ export const packagesData = [
       "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
   },
   {
-    id: 9,
+    id: 11,
     title: "Hyderabad",
     location: "Telangana",
     code: "HYD",
@@ -120,7 +120,7 @@ export const packagesData = [
       "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
   },
   {
-    id: 9,
+    id: 12,
     title: "Hyderabad",
     location: "Telangana",
     code: "HYD",
@@ -131,7 +131,7 @@ export const packagesData = [
       "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
   },
   {
-    id: 9,
+    id: 13,
     title: "Hyderabad",
     location: "Telangana",
     code: "HYD",

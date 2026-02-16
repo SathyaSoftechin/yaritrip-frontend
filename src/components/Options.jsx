@@ -102,7 +102,7 @@ const Options = () => {
                     className={`
                       flex-shrink-0 w-[150px] h-[140px]
                       transition-all duration-300
-                      ${isActive
+                      ${isActive 
                         ? "border-blue-500 bg-blue-50 "
                         : "border-gray-200 bg-white"}
                     `}
