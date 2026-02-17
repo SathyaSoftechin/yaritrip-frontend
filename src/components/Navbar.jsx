@@ -6,13 +6,46 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isHome = location.pathname === "/";
+
   // Pages where navbar should NOT be pill-style
   const noPillRoutes = ["/", "/login", "/signup"];
   const isPillNavbar = !noPillRoutes.includes(location.pathname);
+
+  /* ✅ Scroll Logic */
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroHeight = window.innerHeight; // Hero is full screen
+
+      if (window.scrollY > 10) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+
+      // Show search only after passing hero section
+      if (window.scrollY > heroHeight - 100) {
+        setShowSearch(true);
+      } else {
+        setShowSearch(false);
+      }
+    };
+
+    if (isHome) {
+      window.addEventListener("scroll", handleScroll);
+    } else {
+      setIsSticky(true);
+      setShowSearch(true);
+    }
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isHome]);
 
   /* ✅ Check Login Status */
   useEffect(() => {
@@ -28,12 +61,16 @@ const Navbar = () => {
   }, [location]);
 
   return (
-    <header className="w-full absolute top-4 z-50">
+    <header
+      className={`w-full z-50 transition-all duration-300 ${
+        isSticky ? "fixed top-0 bg-white shadow-md" : "absolute top-4"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4">
         <nav
           className={`h-16 flex items-center justify-between transition-all duration-300
             ${
-              isPillNavbar
+              isPillNavbar && isSticky
                 ? "bg-white rounded-full px-6 shadow-md"
                 : "bg-transparent px-0"
             }`}
@@ -43,9 +80,29 @@ const Navbar = () => {
             <img
               src="/logo2.png"
               alt="Yaritrip Logo"
-              className="h-36 object-contain"
+              className="h-36 object-contain transition-all duration-300"
             />
           </Link>
+
+          {/* 🔍 SHRINKED SEARCH */}
+          {showSearch && (
+            <div className="hidden md:flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full animate-slideDown">
+              <input
+                type="text"
+                placeholder="From"
+                className="bg-transparent outline-none text-sm w-24"
+              />
+              <div className="w-px h-5 bg-gray-300" />
+              <input
+                type="text"
+                placeholder="To Destination"
+                className="bg-transparent outline-none text-sm w-32"
+              />
+              <button className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-blue-700 transition">
+                Search
+              </button>
+            </div>
+          )}
 
           {/* RIGHT SECTION */}
           <div className="hidden md:flex items-center gap-6">
@@ -53,27 +110,8 @@ const Navbar = () => {
             {/* Customer Support */}
             <div
               className={`flex items-center gap-2 text-sm font-medium
-                ${isPillNavbar ? "text-gray-700" : "text-white"}`}
+                ${isSticky ? "text-gray-700" : "text-white"}`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 14 14"
-              >
-                <g fill="none">
-                  <path
-                    fill="#8fbffa"
-                    fillRule="evenodd"
-                    d="M7 1.5a3.25 3.25 0 0 0-3.25 3.25v2.5a.75.75 0 0 1-1.5 0v-2.5A4.75 4.75 0 0 1 7 0h.25A4.75 4.75 0 0 1 12 4.75v5.382c0 .892-.448 1.667-.993 2.198c-.534.521-1.274.92-2.007.92a.75.75 0 0 1 0-1.5c.221 0 .606-.148.96-.493c.341-.334.54-.743.54-1.125V4.75A3.25 3.25 0 0 0 7.25 1.5z"
-                    clipRule="evenodd"
-                  />
-                  <path
-                    fill="#2859c5"
-                    d="M5 12.5A1.5 1.5 0 0 1 6.5 11H8a1.5 1.5 0 0 1 0 3H6.5A1.5 1.5 0 0 1 5 12.5m-5-6A1.5 1.5 0 0 1 1.5 5h2.25v4a1 1 0 0 1-1 1H1.5A1.5 1.5 0 0 1 0 8.5zM10.5 5h2A1.5 1.5 0 0 1 14 6.5v2a1.5 1.5 0 0 1-1.5 1.5h-2z"
-                  />
-                </g>
-              </svg>
               Customer Support
             </div>
 
@@ -82,9 +120,8 @@ const Navbar = () => {
               <button
                 onClick={() => setCountryOpen(!countryOpen)}
                 className={`flex items-center gap-1 text-sm font-medium
-                  ${isPillNavbar ? "text-gray-700" : "text-white"}`}
+                  ${isSticky ? "text-gray-700" : "text-white"}`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="#367eff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a49 49 0 0 1 6-.371m0 0q1.681 0 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138q1.344.092 2.666.257m-4.589 8.495a18 18 0 0 1-3.827-5.802"/></svg>
                 English
                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                   <path d="M19 9l-7 7-7-7" />
@@ -103,14 +140,14 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* ✅ AUTH BASED RENDERING */}
+            {/* AUTH BASED RENDERING */}
             {!isLoggedIn ? (
               <>
                 <Link
                   to="/login"
                   className={`px-4 py-1.5 rounded-full border transition
                     ${
-                      isPillNavbar
+                      isSticky
                         ? "text-gray-100 hover:text-black bg-blue-600"
                         : "border-white hover:text-blue-500 hover:border-blue-500 text-white"
                     }`}
@@ -122,7 +159,7 @@ const Navbar = () => {
                   to="/signup"
                   className={`px-4 py-1.5 rounded-full border transition
                     ${
-                      isPillNavbar
+                      isSticky
                         ? "text-gray-100 hover:text-black bg-blue-600"
                         : "border-white hover:text-blue-500 hover:border-blue-500 text-white"
                     }`}
@@ -147,13 +184,29 @@ const Navbar = () => {
           {/* MOBILE HAMBURGER */}
           <button
             className={`md:hidden text-2xl ${
-              isPillNavbar ? "text-gray-700" : "text-white"
+              isSticky ? "text-gray-700" : "text-white"
             }`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? "✕" : "☰"}
           </button>
         </nav>
+
+        {/* MOBILE SEARCH */}
+        {showSearch && (
+          <div className="md:hidden mt-3 bg-white rounded-xl shadow-md p-4 flex gap-2">
+            <input
+              type="text"
+              placeholder="From"
+              className="flex-1 border px-2 py-1 rounded"
+            />
+            <input
+              type="text"
+              placeholder="To"
+              className="flex-1 border px-2 py-1 rounded"
+            />
+          </div>
+        )}
 
         {/* MOBILE MENU */}
         {mobileMenuOpen && (
@@ -189,6 +242,19 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {/* Smooth animation */}
+      <style>
+        {`
+          .animate-slideDown {
+            animation: slideDown 0.3s ease forwards;
+          }
+          @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
     </header>
   );
 };

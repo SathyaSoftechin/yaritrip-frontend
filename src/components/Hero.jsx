@@ -121,8 +121,9 @@ const Hero = () => {
         {/* Search Card */}
         <div
           ref={wrapperRef}
+          data-hero-search
           className="mt-12 w-full max-w-5xl bg-white/10 backdrop-blur-xl 
-                     rounded-2xl shadow-2xl p-5 relative z-30"
+             rounded-2xl shadow-2xl p-5 relative z-30"
         >
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
             {/* FROM + DESTINATION */}

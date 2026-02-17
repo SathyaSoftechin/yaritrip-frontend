@@ -1,3 +1,14 @@
+import Dubai from "../../assets/packages/dubai.png";
+import Maldives from "../../assets/packages/maldives.png";
+import Kashmir from "../../assets/packages/kashmir.png";
+import Singapore from "../../assets/packages/singapore.png";
+import KualaLumpur from "../../assets/packages/kualalumpur.png";
+import Vietnam from "../../assets/packages/vietnam.png";
+import Bali from "../../assets/packages/bali.png";
+import Bangkok from "../../assets/packages/bangkok.png";
+import Hyderabad from "../../assets/packages/hyderabad.png";
+import Delhi from "../../assets/packages/delhi.png";
+
 export const packagesData = [
   {
     id: 1,
@@ -7,7 +18,7 @@ export const packagesData = [
     nights: 6,
     rating: 4.7,
     price: 80000,
-    // image: {Dubai},
+    image: Dubai,
   },
   {
     id: 2,
@@ -17,8 +28,7 @@ export const packagesData = [
     nights: 4,
     rating: 4.9,
     price: 65499,
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200",
+    image: Maldives,
   },
   {
     id: 3,
@@ -28,8 +38,7 @@ export const packagesData = [
     nights: 5,
     rating: 4.6,
     price: 74999,
-    image:
-      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200",
+    image: Kashmir,
   },
   {
     id: 4,
@@ -39,8 +48,7 @@ export const packagesData = [
     nights: 3,
     rating: 4.8,
     price: 54999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: Singapore,
   },
   {
     id: 5,
@@ -50,8 +58,7 @@ export const packagesData = [
     nights: 4,
     rating: 4.8,
     price: 34999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: KualaLumpur,
   },
   {
     id: 6,
@@ -61,8 +68,7 @@ export const packagesData = [
     nights: 6,
     rating: 4.8,
     price: 57999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: Vietnam,
   },
   {
     id: 7,
@@ -72,8 +78,7 @@ export const packagesData = [
     nights: 5,
     rating: 4.8,
     price: 64999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: Bali,
   },
   {
     id: 8,
@@ -83,8 +88,7 @@ export const packagesData = [
     nights: 5,
     rating: 4.8,
     price: 41999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: Bangkok,
   },
   {
     id: 9,
@@ -94,8 +98,7 @@ export const packagesData = [
     nights: 3,
     rating: 4.8,
     price: 64999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    image: Hyderabad,
   },
   {
     id: 10,
@@ -105,40 +108,6 @@ export const packagesData = [
     nights: 3,
     rating: 4.8,
     price: 74999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
-  },
-  {
-    id: 11,
-    title: "Hyderabad",
-    location: "Telangana",
-    code: "HYD",
-    nights: 3,
-    rating: 4.8,
-    price: 64999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
-  },
-  {
-    id: 12,
-    title: "Hyderabad",
-    location: "Telangana",
-    code: "HYD",
-    nights: 3,
-    rating: 4.5,
-    price: 6499,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
-  },
-  {
-    id: 13,
-    title: "Hyderabad",
-    location: "Telangana",
-    code: "HYD",
-    nights: 3,
-    rating: 4,
-    price: 64999,
-    image:
-      "https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=1200",
+    images: [Delhi, Singapore, Hyderabad, Bangkok],
   },
 ];
