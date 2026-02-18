@@ -80,7 +80,7 @@ const Hero = () => {
   );
 
   const handleSearch = () => {
-    if (!fromCity || !destination || !date) {
+    if (!fromCity || !destination) {
       alert("Please select From, Destination and Date.");
       return;
     }
@@ -90,10 +90,10 @@ const Hero = () => {
       return;
     }
 
-    const formattedDate = date.toISOString().split("T")[0];
+    // const formattedDate = date.toISOString().split("T")[0];
 
     navigate(
-      `/results?from=${fromCity.code}&to=${destination.code}&date=${formattedDate}`,
+      `/results?from=${fromCity.code}&to=${destination.code}`,
     );
   };
 

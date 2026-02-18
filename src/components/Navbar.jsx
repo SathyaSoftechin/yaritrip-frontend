@@ -1,53 +1,73 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+/* -------- AIRPORT LIST -------- */
+const airportCities = [
+  { city: "Hyderabad", country: "India", code: "HYD" },
+  { city: "Delhi", country: "India", code: "DEL" },
+  { city: "Kerala", country: "India", code: "KD" },
+  { city: "Kashmir", country: "India", code: "SXR" },
+  { city: "Andaman", country: "India", code: "IXZ" },
+  { city: "Mumbai", country: "India", code: "BOM" },
+  { city: "Dubai", country: "UAE", code: "DXB" },
+  { city: "Kuala Lumpur", country: "Malaysia", code: "KUL" },
+  { city: "Vietnam", country: "Vietnam", code: "VN" },
+  { city: "Singapore", country: "Singapore", code: "SIN" },
+  { city: "Bali", country: "Indonesia", code: "DPS" },
+  { city: "Bangkok", country: "Thailand", code: "PG" },
+  { city: "Male", country: "Maldives", code: "MLE" },
+];
+
 const Navbar = () => {
-  const [countryOpen, setCountryOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const wrapperRef = useRef(null);
+
+  /* ROUTE CHECK */
+  const isHome = location.pathname === "/";
+  const isLogin = location.pathname === "/login";
+  const isSignup = location.pathname === "/signup";
+  const isAuthPage = isLogin || isSignup;
+  const isOtherPage = !isHome && !isAuthPage;
+
+  /* STATES */
+  const [isSticky, setIsSticky] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
-  const [showSearch, setShowSearch] = useState(false);
-  const [isSticky, setIsSticky] = useState(false);
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  /* Search States */
+  const [fromCity, setFromCity] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [searchFrom, setSearchFrom] = useState("");
+  const [searchTo, setSearchTo] = useState("");
 
-  const isHome = location.pathname === "/";
-
-  // Pages where navbar should NOT be pill-style
-  const noPillRoutes = ["/", "/login", "/signup"];
-  const isPillNavbar = !noPillRoutes.includes(location.pathname);
-
-  /* ✅ Scroll Logic */
+  /* ---------- SCROLL LOGIC ---------- */
   useEffect(() => {
-    const handleScroll = () => {
-      const heroHeight = window.innerHeight; // Hero is full screen
-
-      if (window.scrollY > 10) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-
-      // Show search only after passing hero section
-      if (window.scrollY > heroHeight - 100) {
-        setShowSearch(true);
-      } else {
-        setShowSearch(false);
-      }
-    };
-
     if (isHome) {
+      const handleScroll = () => {
+        const heroHeight = window.innerHeight;
+        setIsSticky(window.scrollY > 20);
+        setShowSearch(window.scrollY > heroHeight - 100);
+      };
       window.addEventListener("scroll", handleScroll);
-    } else {
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+
+    if (isOtherPage) {
       setIsSticky(true);
       setShowSearch(true);
     }
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
+    if (isAuthPage) {
+      setIsSticky(false);
+      setShowSearch(false);
+    }
+  }, [isHome, isOtherPage, isAuthPage]);
 
-  /* ✅ Check Login Status */
+  /* ---------- LOGIN CHECK ---------- */
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedImage = localStorage.getItem("profileImage");
@@ -60,45 +80,204 @@ const Navbar = () => {
     }
   }, [location]);
 
+  /* ---------- SYNC SEARCH FROM URL (Hero ↔ Navbar) ---------- */
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const fromParam = params.get("from");
+    const toParam = params.get("to");
+
+    if (fromParam) {
+      const match = airportCities.find(
+        (item) => item.code.toLowerCase() === fromParam.toLowerCase()
+      );
+      if (match) setFromCity(match);
+    }
+
+    if (toParam) {
+      const match = airportCities.find(
+        (item) => item.code.toLowerCase() === toParam.toLowerCase()
+      );
+      if (match) setDestination(match);
+    }
+  }, [location.search]);
+
+  /* ---------- OUTSIDE CLICK CLOSE ---------- */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  /* ---------- FILTER LOGIC ---------- */
+  const filteredFrom = airportCities.filter(
+    (item) =>
+      item.city.toLowerCase().includes(searchFrom.toLowerCase()) ||
+      item.code.toLowerCase().includes(searchFrom.toLowerCase())
+  );
+
+  const filteredTo = airportCities.filter(
+    (item) =>
+      item.city.toLowerCase().includes(searchTo.toLowerCase()) ||
+      item.code.toLowerCase().includes(searchTo.toLowerCase())
+  );
+
+  /* ---------- SMART MATCH ---------- */
+  const smartMatch = (value, list) => {
+    if (!value) return null;
+    return (
+      list[0] ||
+      airportCities.find(
+        (item) =>
+          item.city.toLowerCase() === value.toLowerCase() ||
+          item.code.toLowerCase() === value.toLowerCase()
+      )
+    );
+  };
+
+  /* ---------- SEARCH SUBMIT ---------- */
+  const handleSearch = () => {
+    let finalFrom = fromCity || smartMatch(searchFrom, filteredFrom);
+    let finalTo = destination || smartMatch(searchTo, filteredTo);
+
+    if (!finalFrom || !finalTo) {
+      alert("Please select valid From and Destination.");
+      return;
+    }
+
+    if (finalFrom.code === finalTo.code) {
+      alert("Departure and Destination cannot be the same airport.");
+      return;
+    }
+
+    navigate(`/results?from=${finalFrom.code}&to=${finalTo.code}`);
+    setMobileMenuOpen(false);
+    setOpenDropdown(null);
+  };
+
+  /* ---------- ENTER KEY AUTO SELECT ---------- */
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
   return (
     <header
       className={`w-full z-50 transition-all duration-300 ${
-        isSticky ? "fixed top-0 bg-white shadow-md" : "absolute top-4"
+        isSticky ? "fixed top-0" : "absolute top-4"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 relative">
         <nav
-          className={`h-16 flex items-center justify-between transition-all duration-300
-            ${
-              isPillNavbar && isSticky
-                ? "bg-white rounded-full px-6 shadow-md"
-                : "bg-transparent px-0"
-            }`}
+          className={`h-16 flex items-center justify-between transition-all duration-300 ${
+            isSticky
+              ? "bg-white rounded-full px-6 shadow-md"
+              : "bg-transparent px-0"
+          }`}
         >
-          {/* LEFT: Logo */}
+          {/* LOGO */}
           <Link to="/" className="flex items-center">
             <img
               src="/logo2.png"
               alt="Yaritrip Logo"
-              className="h-36 object-contain transition-all duration-300"
+              className="h-36 object-contain"
             />
           </Link>
 
-          {/* 🔍 SHRINKED SEARCH */}
+          {/* SEARCH (Desktop) */}
           {showSearch && (
-            <div className="hidden md:flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full animate-slideDown">
-              <input
-                type="text"
-                placeholder="From"
-                className="bg-transparent outline-none text-sm w-24"
-              />
+            <div
+              ref={wrapperRef}
+              className="hidden md:flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full relative"
+            >
+              {/* FROM */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="From"
+                  value={
+                    fromCity
+                      ? `${fromCity.city} (${fromCity.code})`
+                      : searchFrom
+                  }
+                  onFocus={() => setOpenDropdown("from")}
+                  onChange={(e) => {
+                    setSearchFrom(e.target.value);
+                    setFromCity(null);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  className="bg-transparent outline-none text-sm w-28"
+                />
+
+                {openDropdown === "from" && (
+                  <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-xl w-64 max-h-60 overflow-y-auto z-50">
+                    {filteredFrom.map((item) => (
+                      <p
+                        key={item.code}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        onClick={() => {
+                          setFromCity(item);
+                          setOpenDropdown(null);
+                          setSearchFrom("");
+                        }}
+                      >
+                        {item.city} ({item.code}), {item.country}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="w-px h-5 bg-gray-300" />
-              <input
-                type="text"
-                placeholder="To Destination"
-                className="bg-transparent outline-none text-sm w-32"
-              />
-              <button className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-blue-700 transition">
+
+              {/* TO */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="To Destination"
+                  value={
+                    destination
+                      ? `${destination.city} (${destination.code})`
+                      : searchTo
+                  }
+                  onFocus={() => setOpenDropdown("to")}
+                  onChange={(e) => {
+                    setSearchTo(e.target.value);
+                    setDestination(null);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  className="bg-transparent outline-none text-sm w-32"
+                />
+
+                {openDropdown === "to" && (
+                  <div className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-xl w-64 max-h-60 overflow-y-auto z-50">
+                    {filteredTo.map((item) => (
+                      <p
+                        key={item.code}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        onClick={() => {
+                          setDestination(item);
+                          setOpenDropdown(null);
+                          setSearchTo("");
+                        }}
+                      >
+                        {item.city} ({item.code}), {item.country}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={handleSearch}
+                className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm hover:bg-blue-700 transition"
+              >
                 Search
               </button>
             </div>
@@ -106,63 +285,25 @@ const Navbar = () => {
 
           {/* RIGHT SECTION */}
           <div className="hidden md:flex items-center gap-6">
-
-            {/* Customer Support */}
-            <div
-              className={`flex items-center gap-2 text-sm font-medium
-                ${isSticky ? "text-gray-700" : "text-white"}`}
-            >
-              Customer Support
-            </div>
-
-            {/* Language Selector */}
-            <div className="relative">
-              <button
-                onClick={() => setCountryOpen(!countryOpen)}
-                className={`flex items-center gap-1 text-sm font-medium
-                  ${isSticky ? "text-gray-700" : "text-white"}`}
-              >
-                English
-                <svg className="h-4 w-4" viewBox="0 0 24 24">
-                  <path d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {countryOpen && (
-                <div className="absolute right-0 mt-2 w-28 bg-white shadow-lg rounded-md overflow-hidden">
-                  <button className="block w-full px-4 py-2 text-sm hover:bg-gray-100">
-                    Arabic
-                  </button>
-                  <button className="block w-full px-4 py-2 text-sm hover:bg-gray-100">
-                    Hindi
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* AUTH BASED RENDERING */}
             {!isLoggedIn ? (
               <>
                 <Link
                   to="/login"
-                  className={`px-4 py-1.5 rounded-full border transition
-                    ${
-                      isSticky
-                        ? "text-gray-100 hover:text-black bg-blue-600"
-                        : "border-white hover:text-blue-500 hover:border-blue-500 text-white"
-                    }`}
+                  className={`px-4 py-1.5 rounded-full border transition ${
+                    isSticky
+                      ? "text-gray-100 bg-blue-600"
+                      : "border-white text-white"
+                  }`}
                 >
                   Login
                 </Link>
-
                 <Link
                   to="/signup"
-                  className={`px-4 py-1.5 rounded-full border transition
-                    ${
-                      isSticky
-                        ? "text-gray-100 hover:text-black bg-blue-600"
-                        : "border-white hover:text-blue-500 hover:border-blue-500 text-white"
-                    }`}
+                  className={`px-4 py-1.5 rounded-full border transition ${
+                    isSticky
+                      ? "text-gray-100 bg-blue-600"
+                      : "border-white text-white"
+                  }`}
                 >
                   Sign Up
                 </Link>
@@ -192,38 +333,50 @@ const Navbar = () => {
           </button>
         </nav>
 
-        {/* MOBILE SEARCH */}
-        {showSearch && (
-          <div className="md:hidden mt-3 bg-white rounded-xl shadow-md p-4 flex gap-2">
-            <input
-              type="text"
-              placeholder="From"
-              className="flex-1 border px-2 py-1 rounded"
-            />
-            <input
-              type="text"
-              placeholder="To"
-              className="flex-1 border px-2 py-1 rounded"
-            />
-          </div>
-        )}
-
-        {/* MOBILE MENU */}
+        {/* ================= MOBILE DROPDOWN ADDED ================= */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-3 bg-white rounded-2xl shadow-md p-4 space-y-4">
+          <div className="md:hidden mt-4 bg-white rounded-2xl shadow-xl p-6 space-y-6 z-50">
+            
+            {/* Search (Mobile) */}
+            {showSearch && (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="From"
+                  value={fromCity ? fromCity.city : searchFrom}
+                  onChange={(e) => setSearchFrom(e.target.value)}
+                  className="w-full border p-2 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="To"
+                  value={destination ? destination.city : searchTo}
+                  onChange={(e) => setSearchTo(e.target.value)}
+                  className="w-full border p-2 rounded"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="w-full bg-blue-600 text-white py-2 rounded"
+                >
+                  Search
+                </button>
+              </div>
+            )}
+
+            {/* Auth Links */}
             {!isLoggedIn ? (
               <>
                 <Link
                   to="/login"
-                  className="block text-center py-2 border rounded-full"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="block text-center py-2 border rounded-full"
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="block text-center py-2 bg-blue-600 text-white rounded-full"
                   onClick={() => setMobileMenuOpen(false)}
+                  className="block text-center py-2 bg-blue-600 text-white rounded-full"
                 >
                   Sign Up
                 </Link>
@@ -242,19 +395,6 @@ const Navbar = () => {
           </div>
         )}
       </div>
-
-      {/* Smooth animation */}
-      <style>
-        {`
-          .animate-slideDown {
-            animation: slideDown 0.3s ease forwards;
-          }
-          @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}
-      </style>
     </header>
   );
 };

@@ -14,7 +14,13 @@ const PackageDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [autoSlide, setAutoSlide] = useState(true);
 
+  /* -------- ACTIVITY STATES -------- */
+  const [selectedActivities, setSelectedActivities] = useState([]);
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [activeActivityDay, setActiveActivityDay] = useState(null);
+
   const touchStartX = useRef(null);
+  const modalRef = useRef(null);
 
   const pkg = useMemo(() => {
     return packagesData.find((item) => item.id === Number(id));
@@ -43,8 +49,35 @@ const PackageDetails = () => {
     "Activities",
   ];
 
-  /* ---------------- TAB ANIMATION ---------------- */
+  /* -------- ADD-ON ACTIVITIES -------- */
+  const activitiesList = [
+    {
+      id: 1,
+      name: "Desert Safari Experience",
+      price: 3500,
+      image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+    },
+    {
+      id: 2,
+      name: "Luxury Yacht Cruise",
+      price: 5200,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    },
+    {
+      id: 3,
+      name: "Helicopter City Tour",
+      price: 8900,
+      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    },
+    {
+      id: 4,
+      name: "Adventure Water Sports",
+      price: 4200,
+      image: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b",
+    },
+  ];
 
+  /* -------- TAB CHANGE -------- */
   const handleTabChange = (tab) => {
     const currentIndex = tabs.indexOf(activeTab);
     const newIndex = tabs.indexOf(tab);
@@ -52,8 +85,45 @@ const PackageDetails = () => {
     setActiveTab(tab);
   };
 
-  /* ---------------- LIGHTBOX ---------------- */
+  /* -------- ACTIVITY TOGGLE -------- */
+  const handleActivityToggle = (activity, day) => {
+    const exists = selectedActivities.find(
+      (item) => item.id === activity.id && item.day === day,
+    );
 
+    if (exists) {
+      setSelectedActivities((prev) =>
+        prev.filter((item) => !(item.id === activity.id && item.day === day)),
+      );
+    } else {
+      setSelectedActivities((prev) => [...prev, { ...activity, day }]);
+    }
+  };
+
+  /* -------- PRICE CALCULATION -------- */
+  const activitiesTotal = selectedActivities.reduce(
+    (sum, item) => sum + item.price,
+    0,
+  );
+
+  const totalPrice = pkg.price + activitiesTotal;
+
+  /* -------- MODAL CLOSE LOGIC -------- */
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setActivityModalOpen(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
+  const handleOverlayClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      setActivityModalOpen(false);
+    }
+  };
+
+  /* -------- LIGHTBOX -------- */
   const openLightbox = (index) => {
     setCurrentImageIndex(index);
     setLightboxOpen(true);
@@ -66,18 +136,12 @@ const PackageDetails = () => {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
-
-  /* ---------------- AUTO SLIDE ---------------- */
 
   useEffect(() => {
     if (!lightboxOpen || !autoSlide) return;
@@ -85,36 +149,8 @@ const PackageDetails = () => {
     return () => clearInterval(interval);
   }, [lightboxOpen, autoSlide]);
 
-  /* ---------------- KEYBOARD ---------------- */
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!lightboxOpen) return;
-      if (e.key === "ArrowRight") nextImage();
-      if (e.key === "ArrowLeft") prevImage();
-      if (e.key === "Escape") closeLightbox();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [lightboxOpen]);
-
-  /* ---------------- SWIPE ---------------- */
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    if (!touchStartX.current) return;
-
-    if (touchStartX.current - touchEndX > 50) nextImage();
-    if (touchEndX - touchStartX.current > 50) prevImage();
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 pb-16 mt-20">
-
       {/* HEADER */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -135,9 +171,7 @@ const PackageDetails = () => {
               alt=""
               onClick={() => openLightbox(index)}
               className={`${
-                index === 0
-                  ? "col-span-2 row-span-2 h-64 md:h-80"
-                  : "h-40"
+                index === 0 ? "col-span-2 row-span-2 h-64 md:h-80" : "h-40"
               } w-full object-cover rounded-xl cursor-pointer hover:scale-105 transition`}
             />
           ))}
@@ -167,30 +201,23 @@ const PackageDetails = () => {
         </div>
       </div>
 
-      {/* ---------------- YOUR PROVIDED SECTION INTEGRATED ---------------- */}
-
+      {/* MAIN CONTENT */}
       <div className="max-w-7xl mx-auto px-6 mt-10 grid md:grid-cols-3 gap-8">
-
-        {/* Left Content */}
-        <div className="md:col-span-2 overflow-hidden">
-
+        {/* LEFT CONTENT */}
+        <div className="md:col-span-2">
           <div
             key={activeTab}
-            className={`transition-all duration-400 ${
-              direction === "right"
-                ? "animate-slideRight"
-                : "animate-slideLeft"
+            className={`transition-all duration-300 ${
+              direction === "right" ? "animate-slideRight" : "animate-slideLeft"
             } bg-white rounded-2xl shadow p-6`}
           >
             {activeTab === "Overview" && (
               <>
-                <h2 className="text-lg font-semibold mb-4">
-                  Package Overview
-                </h2>
+                <h2 className="text-lg font-semibold mb-4">Package Overview</h2>
                 <p className="text-gray-600">
                   Enjoy a premium {pkg.nights}-night getaway in{" "}
-                  <strong>{pkg.location}</strong>. Includes hotels,
-                  transfers, sightseeing and curated experiences.
+                  <strong>{pkg.location}</strong>. Includes hotels, transfers,
+                  sightseeing and curated experiences.
                 </p>
               </>
             )}
@@ -199,18 +226,28 @@ const PackageDetails = () => {
               Array.from({ length: pkg.nights }).map((_, index) => (
                 <div key={index} className="border rounded-xl mb-4">
                   <button
-                    onClick={() =>
-                      setOpenDay(openDay === index ? null : index)
-                    }
+                    onClick={() => setOpenDay(openDay === index ? null : index)}
                     className="w-full px-4 py-3 flex justify-between font-medium"
                   >
                     Day {index + 1}
                     <span>{openDay === index ? "−" : "+"}</span>
                   </button>
+
                   {openDay === index && (
-                    <div className="px-4 pb-4 text-sm text-gray-600">
-                      Arrival, check-in, sightseeing and local
-                      experiences.
+                    <div className="px-4 pb-4 space-y-4 text-sm text-gray-600">
+                      <p>
+                        Arrival, check-in, sightseeing and curated experiences.
+                      </p>
+
+                      <button
+                        onClick={() => {
+                          setActiveActivityDay(index);
+                          setActivityModalOpen(true);
+                        }}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs hover:bg-blue-700 transition"
+                      >
+                        + Add Activity
+                      </button>
                     </div>
                   )}
                 </div>
@@ -230,88 +267,141 @@ const PackageDetails = () => {
 
             {activeTab === "Activities" && (
               <p className="text-gray-600">
-                Guided tours, adventure sports and curated
-                experiences.
+                Guided tours, adventure sports and curated experiences.
               </p>
             )}
           </div>
         </div>
 
-        {/* Price Card */}
+        {/* PRICE CARD */}
         <div className="bg-white rounded-2xl shadow p-6 h-fit sticky top-28">
           <h3 className="text-lg font-semibold">Starting From</h3>
-          <div className="mt-3 text-3xl font-bold">
-            ₹{pkg.price.toLocaleString()}
+
+          <div className="mt-3 text-3xl font-bold transition-all duration-300">
+            ₹{totalPrice.toLocaleString()}
             <span className="text-sm text-gray-500"> /person</span>
           </div>
-          <div className="mt-2 text-yellow-500">
-            ⭐ {pkg.rating} Rating
-          </div>
-          <button className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition">
+
+          {activitiesTotal > 0 && (
+            <div className="mt-2 text-sm text-green-600 font-medium">
+              + ₹{activitiesTotal.toLocaleString()} added on selected activities
+            </div>
+          )}
+
+          <div className="mt-2 text-yellow-500">⭐ {pkg.rating} Rating</div>
+
+          {/* -------- SELECTED ACTIVITIES SUMMARY -------- */}
+          {selectedActivities.length > 0 && (
+            <div className="mt-6 border-t pt-4">
+              <h4 className="text-sm font-semibold mb-3 text-gray-700">
+                Selected Activities Breakdown
+              </h4>
+
+              {Object.entries(
+                selectedActivities.reduce((acc, activity) => {
+                  if (!acc[activity.day]) acc[activity.day] = [];
+                  acc[activity.day].push(activity);
+                  return acc;
+                }, {}),
+              ).map(([day, activities]) => (
+                <div key={day} className="mb-4">
+                  <p className="text-xs font-semibold text-gray-600 mb-2">
+                    Day {Number(day) + 1}
+                  </p>
+
+                  {activities.map((act, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between text-xs text-gray-700 mb-1"
+                    >
+                      <span>{act.name}</span>
+                      <span className="font-medium">
+                        ₹{act.price.toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={() => navigate(`/checkout/${pkg.id}`)}
+            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
+          >
             Proceed to Booking
           </button>
+
           <p className="mt-6 text-xs text-red-500">
             <b>*Prices may vary depending on availability.</b>
           </p>
         </div>
       </div>
 
-      {/* LIGHTBOX MODAL */}
-      {lightboxOpen && (
-        <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50">
-
-          <button
-            onClick={closeLightbox}
-            className="absolute top-6 right-6 text-white text-3xl"
-          >
-            ✕
-          </button>
-
-          <div className="absolute top-6 left-6 text-white text-sm">
-            {currentImageIndex + 1} / {images.length}
-          </div>
-
-          <button
-            onClick={prevImage}
-            className="absolute left-6 text-white text-5xl hover:scale-110 transition"
-          >
-            ‹
-          </button>
-
+      {/* -------- ANIMATED ACTIVITY MODAL -------- */}
+      {activityModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fadeIn"
+          onClick={handleOverlayClick}
+        >
           <div
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            className="max-w-5xl w-full px-6"
+            ref={modalRef}
+            className="bg-white rounded-2xl p-6 w-full max-w-4xl relative max-h-[85vh] overflow-y-auto animate-scaleIn"
           >
-            <img
-              src={images[currentImageIndex]}
-              alt=""
-              className="max-h-[75vh] mx-auto rounded-xl shadow-2xl transition hover:scale-105"
-            />
-          </div>
+            <button
+              onClick={() => setActivityModalOpen(false)}
+              className="absolute top-4 right-4 text-xl"
+            >
+              ✕
+            </button>
 
-          <button
-            onClick={nextImage}
-            className="absolute right-6 text-white text-5xl hover:scale-110 transition"
-          >
-            ›
-          </button>
+            <h3 className="text-lg font-semibold mb-1">{pkg.title} Package</h3>
 
-          <div className="flex gap-3 mt-6 overflow-x-auto px-6 max-w-4xl">
-            {images.map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt=""
-                onClick={() => setCurrentImageIndex(index)}
-                className={`h-20 w-28 object-cover rounded-lg cursor-pointer border-2 transition
-                  ${
-                    currentImageIndex === index
-                      ? "border-blue-500"
-                      : "border-transparent opacity-70 hover:opacity-100"
-                  }`}
-              />
-            ))}
+            <p className="text-sm text-gray-500 mb-6">
+              Add Activity – Day {activeActivityDay + 1} of {pkg.nights}-Night
+              Trip
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {activitiesList.map((activity) => {
+                const isSelected = selectedActivities.find(
+                  (item) =>
+                    item.id === activity.id && item.day === activeActivityDay,
+                );
+
+                return (
+                  <div
+                    key={activity.id}
+                    className="border rounded-xl overflow-hidden shadow"
+                  >
+                    <img
+                      src={activity.image}
+                      alt={activity.name}
+                      className="h-40 w-full object-cover"
+                    />
+                    <div className="p-4">
+                      <h4 className="font-semibold">{activity.name}</h4>
+                      <p className="text-sm text-gray-500 mb-3">
+                        ₹{activity.price.toLocaleString()}
+                      </p>
+
+                      <button
+                        onClick={() =>
+                          handleActivityToggle(activity, activeActivityDay)
+                        }
+                        className={`w-full py-2 rounded-lg text-sm ${
+                          isSelected
+                            ? "bg-red-500 text-white"
+                            : "bg-blue-600 text-white"
+                        }`}
+                      >
+                        {isSelected ? "Remove" : "Add Activity"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -325,6 +415,13 @@ const PackageDetails = () => {
           .animate-slideLeft {
             animation: slideLeft 0.3s ease forwards;
           }
+          .animate-fadeIn {
+            animation: fadeIn 0.25s ease forwards;
+          }
+          .animate-scaleIn {
+            animation: scaleIn 0.25s ease forwards;
+          }
+
           @keyframes slideRight {
             from { opacity: 0; transform: translateX(30px); }
             to { opacity: 1; transform: translateX(0); }
@@ -333,9 +430,16 @@ const PackageDetails = () => {
             from { opacity: 0; transform: translateX(-30px); }
             to { opacity: 1; transform: translateX(0); }
           }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+          }
         `}
       </style>
-
     </div>
   );
 };
