@@ -326,7 +326,7 @@ const PackageDetails = () => {
           )}
 
           <button
-            onClick={() => navigate(`/checkout/${pkg.id}`)}
+            onClick={() => navigate(`/checkout/${pkg.id}/travellers`)}
             className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
           >
             Proceed to Booking
