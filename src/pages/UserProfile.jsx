@@ -34,7 +34,7 @@ const UserProfile = () => {
       return;
     }
 
-    fetch("http://192.168.1.3:8081/api/users/me", {
+    fetch("http://192.168.1.9:8081/api/users/me", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + token,
@@ -79,7 +79,7 @@ const UserProfile = () => {
   const handleSave = () => {
     const token = localStorage.getItem("token");
 
-    fetch("http://192.168.1.3:8081/api/users/me", {
+    fetch("http://192.168.1.9:8081/api/users/me", {
       method: "PUT",
       headers: {
         Authorization: "Bearer " + token,
