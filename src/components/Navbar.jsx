@@ -177,7 +177,7 @@ const Navbar = () => {
         <nav
           className={`h-16 flex items-center justify-between transition-all duration-300 ${
             isSticky
-              ? "bg-white rounded-full px-6 shadow-md"
+              ? "bg-white rounded-full px-6 shadow-md mt-3"
               : "bg-transparent px-0"
           }`}
         >

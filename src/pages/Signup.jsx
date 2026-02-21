@@ -60,7 +60,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("http://192.168.1.9:8081/api/auth/register", {
+      const response = await fetch("http://192.168.1.4:8081/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "http://192.168.1.9:8081/oauth2/authorization/google";
+    window.location.href = "http://192.168.1.4:8081/oauth2/authorization/google";
   };
 
   return (

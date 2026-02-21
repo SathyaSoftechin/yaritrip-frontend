@@ -60,7 +60,7 @@ const exploreImages = {
 
 const countries = ["Dubai", "India", "Singapore", "Bangkok"];
 
-const API_BASE = "http://192.168.1.9:8081";
+const API_BASE = "http://192.168.1.4:8081";
 
 /* -------- COMPONENT -------- */
 const Attractions = () => {
@@ -176,7 +176,7 @@ const Attractions = () => {
 
                       <div className="flex items-center gap-2">
                         <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-md font-semibold">
-                          ⭐{item.rating}/5
+                          ⭐{item.rating}/10
                         </span>
                         <span className="text-xs text-gray-500">
                           {item.reviews.toLocaleString()} reviews

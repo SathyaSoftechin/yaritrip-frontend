@@ -9,6 +9,7 @@ const TravellersStep = () => {
 
   const {
     travellers,
+    addons,
     addTraveller,
     updateTraveller,
     removeTraveller,
@@ -17,29 +18,10 @@ const TravellersStep = () => {
   } = useCheckoutStore();
 
   const pkg = packagesData.find((p) => p.id === Number(id));
-  const [showSummary, setShowSummary] = useState(false);
   const [animatedTotal, setAnimatedTotal] = useState(0);
 
-  /* ---------------- Persist State ---------------- */
   useEffect(() => {
-    const saved = localStorage.getItem("checkoutTravellers");
-    if (saved) {
-      useCheckoutStore.setState({ travellers: JSON.parse(saved) });
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "checkoutTravellers",
-      JSON.stringify(travellers)
-    );
-  }, [travellers]);
-
-  /* ---------------- Set Package ---------------- */
-  useEffect(() => {
-    if (pkg) {
-      setPackage(pkg);
-    }
+    if (pkg) setPackage(pkg);
   }, [pkg, setPackage]);
 
   if (!pkg) return <div className="p-10">Package not found</div>;
@@ -51,9 +33,14 @@ const TravellersStep = () => {
 
   const adultTotal = adults.length * pkg.price;
   const childTotal = children.length * (pkg.price * 0.75);
+
+  const addonsTotal = addons.reduce(
+    (sum, addon) => sum + addon.price,
+    0
+  );
+
   const totalAmount = travellers.length === 0 ? 0 : getTotal();
 
-  /* ---------------- Animate Price ---------------- */
   useEffect(() => {
     let start = animatedTotal;
     const diff = totalAmount - start;
@@ -72,7 +59,6 @@ const TravellersStep = () => {
     requestAnimationFrame(animate);
   }, [totalAmount]);
 
-  /* ---------------- Validation ---------------- */
   const handleContinue = () => {
     if (travellers.length === 0) {
       alert("Please add at least one traveller.");
@@ -84,6 +70,7 @@ const TravellersStep = () => {
         !t.name ||
         !t.age ||
         !t.email ||
+        !t.gender ||
         (isAbroad && !t.passport)
     );
 
@@ -98,12 +85,12 @@ const TravellersStep = () => {
   return (
     <div className="relative">
 
-      {/* ================= Step Progress ================= */}
+      {/* STEP PROGRESS */}
       <div className="flex items-center justify-between mb-8">
         {["Travellers", "Review", "Payment"].map((step, index) => (
           <div key={step} className="flex-1 text-center">
             <div
-              className={`mx-auto w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+              className={`mx-auto w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                 index === 0
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300"
@@ -118,22 +105,17 @@ const TravellersStep = () => {
 
       <div className="flex flex-col lg:flex-row gap-8">
 
-        {/* ================= LEFT SIDE ================= */}
+        {/* LEFT SIDE */}
         <div className="flex-1">
+
           <h2 className="text-2xl font-semibold mb-6">
             Traveller Details
           </h2>
 
-          {travellers.length === 0 && (
-            <p className="text-gray-500 mb-4">
-              No travellers added yet.
-            </p>
-          )}
-
           {travellers.map((traveller, index) => (
             <div
               key={index}
-              className="border p-5 rounded-lg mb-5 bg-gray-50 transition-all duration-300"
+              className="border p-5 rounded-lg mb-5 bg-gray-50"
             >
               <div className="flex justify-between items-center mb-4">
                 <p className="font-medium">
@@ -206,7 +188,7 @@ const TravellersStep = () => {
             </div>
           ))}
 
-          {/* Add Buttons */}
+          {/* ADD BUTTONS */}
           <div className="flex gap-4 mt-4">
             <button
               onClick={() =>
@@ -215,7 +197,7 @@ const TravellersStep = () => {
                   name: "",
                   age: "",
                   email: "",
-                  gender: "",
+                  gender:" ",
                 })
               }
               className="px-4 py-2 bg-blue-600 text-white rounded-full"
@@ -230,7 +212,7 @@ const TravellersStep = () => {
                   name: "",
                   age: "",
                   email: "",
-                  gender: "",
+                  gender:" ",
                 })
               }
               className="px-4 py-2 bg-green-600 text-white rounded-full"
@@ -239,15 +221,74 @@ const TravellersStep = () => {
             </button>
           </div>
 
+          {/* MOBILE SUMMARY — FORCED DIRECT POSITION */}
+          <div className="lg:hidden border rounded-xl p-6 shadow-sm bg-white mt-6">
+
+            <h3 className="text-lg font-semibold mb-4">
+              Price Summary
+            </h3>
+
+            <div className="flex justify-between mb-2">
+              <span>Adults ({adults.length})</span>
+              <span>₹{adultTotal.toLocaleString()}</span>
+            </div>
+
+            <div className="flex justify-between mb-2">
+              <span>Children ({children.length})</span>
+              <span>₹{childTotal.toLocaleString()}</span>
+            </div>
+
+            {addons.length > 0 && (
+              <>
+                <hr className="my-4" />
+                <p className="text-sm font-medium mb-2">
+                  Selected Activities
+                </p>
+
+                {addons.map((addon) => (
+                  <div
+                    key={addon.id}
+                    className="flex justify-between text-sm mb-1"
+                  >
+                    <span>
+                      Day {addon.day + 1} - {addon.name}
+                    </span>
+                    <span>
+                      ₹{addon.price.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+
+                <div className="flex justify-between font-medium mt-2">
+                  <span>Add-ons Total</span>
+                  <span>
+                    ₹{addonsTotal.toLocaleString()}
+                  </span>
+                </div>
+              </>
+            )}
+
+            <hr className="my-4" />
+
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span>
+                ₹{Math.round(animatedTotal).toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* CONTINUE BUTTON — NOW GUARANTEED BELOW SUMMARY */}
           <button
             onClick={handleContinue}
-            className="mt-8 px-6 py-3 bg-black text-white rounded-full"
+            className="mt-6 w-full px-6 py-3 bg-black text-white rounded-full"
           >
             Continue to Review
           </button>
+
         </div>
 
-        {/* ================= DESKTOP SIDEBAR ================= */}
+        {/* DESKTOP SIDEBAR */}
         <div className="hidden lg:block w-96">
           <div className="sticky top-6 border rounded-xl p-6 shadow-sm bg-white">
             <h3 className="text-lg font-semibold mb-4">
@@ -264,6 +305,36 @@ const TravellersStep = () => {
               <span>₹{childTotal.toLocaleString()}</span>
             </div>
 
+            {addons.length > 0 && (
+              <>
+                <hr className="my-4" />
+                <p className="text-sm font-medium mb-2">
+                  Selected Activities
+                </p>
+
+                {addons.map((addon) => (
+                  <div
+                    key={addon.id}
+                    className="flex justify-between text-sm mb-1"
+                  >
+                    <span>
+                      Day {addon.day + 1} - {addon.name}
+                    </span>
+                    <span>
+                      ₹{addon.price.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+
+                <div className="flex justify-between font-medium mt-2">
+                  <span>Add-ons Total</span>
+                  <span>
+                    ₹{addonsTotal.toLocaleString()}
+                  </span>
+                </div>
+              </>
+            )}
+
             <hr className="my-4" />
 
             <div className="flex justify-between font-bold text-lg">
@@ -274,34 +345,7 @@ const TravellersStep = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ================= MOBILE SUMMARY DRAWER ================= */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg">
-        <div className="flex justify-between items-center">
-          <p className="font-semibold">
-            ₹{Math.round(animatedTotal).toLocaleString()}
-          </p>
-          <button
-            onClick={() => setShowSummary(!showSummary)}
-            className="text-blue-600 text-sm"
-          >
-            {showSummary ? "Hide" : "View Details"}
-          </button>
-        </div>
-
-        {showSummary && (
-          <div className="mt-4 text-sm">
-            <div className="flex justify-between">
-              <span>Adults ({adults.length})</span>
-              <span>₹{adultTotal.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Children ({children.length})</span>
-              <span>₹{childTotal.toLocaleString()}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
