@@ -5,7 +5,13 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import UserProfile from "../pages/UserProfile";
 import ResultsPage from "../pages/Results";
+
+/* OLD Results-Based Package Page */
 import PackageDetails from "../pages/PackageDetails";
+
+/* NEW Country Flow */
+import CountryPackages from "../pages/Packages/CountryPackages";
+import PackageDetail from "../pages/packages/PackageDetail";
 
 /* Checkout Pages */
 import CheckoutLayout from "../pages/checkout/CheckoutLayout";
@@ -17,13 +23,27 @@ import SuccessStep from "../pages/checkout/SuccessStep";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Main Pages */}
+
+      {/* ================= MAIN PAGES ================= */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/user-profile" element={<UserProfile />} />
       <Route path="/results" element={<ResultsPage />} />
+
+      {/* ================= OLD PACKAGE FLOW (Results Page) ================= */}
       <Route path="/package/:id" element={<PackageDetails />} />
+
+      {/* ================= NEW COUNTRY PACKAGE FLOW ================= */}
+
+      {/* Important: Country route FIRST */}
+      <Route path="/packages/:country" element={<CountryPackages />} />
+
+      {/* Then detailed package route */}
+      <Route
+        path="/packages/:country/:packageId"
+        element={<PackageDetail />}
+      />
 
       {/* ================= CHECKOUT FLOW ================= */}
       <Route path="/checkout/:id" element={<CheckoutLayout />}>
@@ -33,8 +53,16 @@ const AppRoutes = () => {
         <Route path="success" element={<SuccessStep />} />
       </Route>
 
-      {/* Optional: Redirect fallback */}
-      {/* <Route path="*" element={<NotFound />} /> */}
+      {/* ================= 404 ================= */}
+      <Route
+        path="*"
+        element={
+          <div className="min-h-screen flex items-center justify-center text-2xl font-semibold">
+            Page Not Found
+          </div>
+        }
+      />
+
     </Routes>
   );
 };

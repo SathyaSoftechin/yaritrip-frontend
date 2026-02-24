@@ -137,7 +137,7 @@ const VisaFree = () => {
 
         <div className="relative z-10 p-10 text-white">
           <h2 className="text-3xl font-semibold mb-8">
-            Visa-Free Destinations for Indians (2026)
+            Visa-Free Destinations for Indians 20<span className="text-red-600 font-bold text-4xl">26</span>
           </h2>
 
           {/* Tabs */}

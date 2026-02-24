@@ -6,6 +6,10 @@ import { useCheckoutStore } from "../store/checkout.store";
 const PackageDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  // 🔒 Strict numeric route protection
+  const numericId = Number(id);
+  const isValidNumericRoute =
+    id !== undefined && !isNaN(numericId) && String(numericId) === String(id);
 
   const [activeTab, setActiveTab] = useState("Overview");
   const [direction, setDirection] = useState("right");
@@ -21,17 +25,14 @@ const PackageDetails = () => {
   const [activeActivityDay, setActiveActivityDay] = useState(null);
 
   /* -------- CHECKOUT STORE -------- */
-  const {
-    toggleAddon,
-    clearAddons,
-    setPackage
-  } = useCheckoutStore();
+  const { toggleAddon, clearAddons, setPackage } = useCheckoutStore();
 
   const modalRef = useRef(null);
 
   const pkg = useMemo(() => {
-    return packagesData.find((item) => item.id === Number(id));
-  }, [id]);
+    if (!isValidNumericRoute) return null;
+    return packagesData.find((item) => item.id === numericId);
+  }, [numericId, isValidNumericRoute]);
 
   /* -------- SAFE PACKAGE INITIALIZATION -------- */
   useEffect(() => {
@@ -41,6 +42,12 @@ const PackageDetails = () => {
       setPackage(pkg);
     }
   }, [pkg, clearAddons, setPackage]);
+  console.log("PackageDetails loaded");
+
+  // 🔒 Prevent accidental rendering from /packages/:country
+  if (!isValidNumericRoute) {
+    return null;
+  }
 
   if (!pkg) {
     return (
@@ -104,7 +111,7 @@ const PackageDetails = () => {
   /* -------- ACTIVITY TOGGLE (SYNCED TO STORE) -------- */
   const handleActivityToggle = (activity, day) => {
     const exists = selectedActivities.find(
-      (item) => item.id === activity.id && item.day === day
+      (item) => item.id === activity.id && item.day === day,
     );
 
     const activityForStore = {
@@ -115,16 +122,11 @@ const PackageDetails = () => {
 
     if (exists) {
       setSelectedActivities((prev) =>
-        prev.filter(
-          (item) => !(item.id === activity.id && item.day === day)
-        )
+        prev.filter((item) => !(item.id === activity.id && item.day === day)),
       );
       toggleAddon(activityForStore);
     } else {
-      setSelectedActivities((prev) => [
-        ...prev,
-        { ...activity, day },
-      ]);
+      setSelectedActivities((prev) => [...prev, { ...activity, day }]);
       toggleAddon(activityForStore);
     }
   };
@@ -132,7 +134,7 @@ const PackageDetails = () => {
   /* -------- PRICE CALCULATION -------- */
   const activitiesTotal = selectedActivities.reduce(
     (sum, item) => sum + item.price,
-    0
+    0,
   );
 
   const totalPrice = pkg.price + activitiesTotal;
@@ -165,9 +167,7 @@ const PackageDetails = () => {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   useEffect(() => {
@@ -198,9 +198,7 @@ const PackageDetails = () => {
               alt=""
               onClick={() => openLightbox(index)}
               className={`${
-                index === 0
-                  ? "col-span-2 row-span-2 h-64 md:h-80"
-                  : "h-40"
+                index === 0 ? "col-span-2 row-span-2 h-64 md:h-80" : "h-40"
               } w-full object-cover rounded-xl cursor-pointer hover:scale-105 transition`}
             />
           ))}
@@ -236,20 +234,16 @@ const PackageDetails = () => {
           <div
             key={activeTab}
             className={`transition-all duration-300 ${
-              direction === "right"
-                ? "animate-slideRight"
-                : "animate-slideLeft"
+              direction === "right" ? "animate-slideRight" : "animate-slideLeft"
             } bg-white rounded-2xl shadow p-6`}
           >
             {activeTab === "Overview" && (
               <>
-                <h2 className="text-lg font-semibold mb-4">
-                  Package Overview
-                </h2>
+                <h2 className="text-lg font-semibold mb-4">Package Overview</h2>
                 <p className="text-gray-600">
                   Enjoy a premium {pkg.nights}-night getaway in{" "}
-                  <strong>{pkg.location}</strong>. Includes hotels,
-                  transfers, sightseeing and curated experiences.
+                  <strong>{pkg.location}</strong>. Includes hotels, transfers,
+                  sightseeing and curated experiences.
                 </p>
               </>
             )}
@@ -258,24 +252,17 @@ const PackageDetails = () => {
               Array.from({ length: pkg.nights }).map((_, index) => (
                 <div key={index} className="border rounded-xl mb-4">
                   <button
-                    onClick={() =>
-                      setOpenDay(
-                        openDay === index ? null : index
-                      )
-                    }
+                    onClick={() => setOpenDay(openDay === index ? null : index)}
                     className="w-full px-4 py-3 flex justify-between font-medium"
                   >
                     Day {index + 1}
-                    <span>
-                      {openDay === index ? "−" : "+"}
-                    </span>
+                    <span>{openDay === index ? "−" : "+"}</span>
                   </button>
 
                   {openDay === index && (
                     <div className="px-4 pb-4 space-y-4 text-sm text-gray-600">
                       <p>
-                        Arrival, check-in, sightseeing and curated
-                        experiences.
+                        Arrival, check-in, sightseeing and curated experiences.
                       </p>
 
                       <button
@@ -306,8 +293,7 @@ const PackageDetails = () => {
 
             {activeTab === "Activities" && (
               <p className="text-gray-600">
-                Guided tours, adventure sports and curated
-                experiences.
+                Guided tours, adventure sports and curated experiences.
               </p>
             )}
           </div>
@@ -315,43 +301,29 @@ const PackageDetails = () => {
 
         {/* PRICE CARD */}
         <div className="bg-white rounded-2xl shadow p-6 h-fit sticky top-28">
-          <h3 className="text-lg font-semibold">
-            Starting From
-          </h3>
+          <h3 className="text-lg font-semibold">Starting From</h3>
 
           <div className="mt-3 text-3xl font-bold">
             ₹{totalPrice.toLocaleString()}
-            <span className="text-sm text-gray-500">
-              {" "}
-              /person
-            </span>
+            <span className="text-sm text-gray-500"> /person</span>
           </div>
           {activitiesTotal > 0 && (
             <div className="mt-2 text-sm text-green-600 font-medium">
-              + ₹{activitiesTotal.toLocaleString()} added on
-              selected activities
+              + ₹{activitiesTotal.toLocaleString()} added on selected activities
             </div>
           )}
 
-          <div className="mt-2 text-yellow-500">
-            ⭐ {pkg.rating} Rating
-          </div>
+          <div className="mt-2 text-yellow-500">⭐ {pkg.rating} Rating</div>
 
           <button
-            onClick={() =>
-              navigate(
-                `/checkout/${pkg.id}/travellers`
-              )
-            }
+            onClick={() => navigate(`/checkout/${pkg.id}/travellers`)}
             className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
           >
             Proceed to Booking
           </button>
 
           <p className="mt-6 text-xs text-red-500">
-            <b>
-              *Prices may vary depending on availability.
-            </b>
+            <b>*Prices may vary depending on availability.</b>
           </p>
         </div>
       </div>
@@ -367,33 +339,25 @@ const PackageDetails = () => {
             className="bg-white rounded-2xl p-6 w-full max-w-4xl relative max-h-[85vh] overflow-y-auto"
           >
             <button
-              onClick={() =>
-                setActivityModalOpen(false)
-              }
+              onClick={() => setActivityModalOpen(false)}
               className="absolute top-4 right-4 text-xl"
             >
               ✕
             </button>
 
-            <h3 className="text-lg font-semibold mb-1">
-              {pkg.title} Package
-            </h3>
+            <h3 className="text-lg font-semibold mb-1">{pkg.title} Package</h3>
 
             <p className="text-sm text-gray-500 mb-6">
-              Add Activity – Day{" "}
-              {activeActivityDay + 1} of{" "}
-              {pkg.nights}-Night Trip
+              Add Activity – Day {activeActivityDay + 1} of {pkg.nights}-Night
+              Trip
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">
               {activitiesList.map((activity) => {
-                const isSelected =
-                  selectedActivities.find(
-                    (item) =>
-                      item.id === activity.id &&
-                      item.day ===
-                        activeActivityDay
-                  );
+                const isSelected = selectedActivities.find(
+                  (item) =>
+                    item.id === activity.id && item.day === activeActivityDay,
+                );
 
                 return (
                   <div
@@ -406,20 +370,14 @@ const PackageDetails = () => {
                       className="h-40 w-full object-cover"
                     />
                     <div className="p-4">
-                      <h4 className="font-semibold">
-                        {activity.name}
-                      </h4>
+                      <h4 className="font-semibold">{activity.name}</h4>
                       <p className="text-sm text-gray-500 mb-3">
-                        ₹
-                        {activity.price.toLocaleString()}
+                        ₹{activity.price.toLocaleString()}
                       </p>
 
                       <button
                         onClick={() =>
-                          handleActivityToggle(
-                            activity,
-                            activeActivityDay
-                          )
+                          handleActivityToggle(activity, activeActivityDay)
                         }
                         className={`w-full py-2 rounded-lg text-sm ${
                           isSelected
@@ -427,9 +385,7 @@ const PackageDetails = () => {
                             : "bg-blue-600 text-white"
                         }`}
                       >
-                        {isSelected
-                          ? "Remove"
-                          : "Add Activity"}
+                        {isSelected ? "Remove" : "Add Activity"}
                       </button>
                     </div>
                   </div>
