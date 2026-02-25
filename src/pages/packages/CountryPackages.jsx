@@ -1,67 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { fetchPackagesByCountry } from "../../services/package.service";
+import { attractionsPackages } from "../../data/attractionsPackages";
 
 const CountryPackages = () => {
   const { country } = useParams();
   const navigate = useNavigate();
 
-  const normalizedCountry = country?.toLowerCase();
-
-  const [packages, setPackages] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadPackages = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchPackagesByCountry(normalizedCountry);
-
-        if (!mounted) return;
-
-        setPackages(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.log("Backend down — using fallback");
-
-        if (!mounted) return;
-
-        setPackages([
-          {
-            id: "dubai-global-village",
-            title: "Dubai : Global Village Entry",
-            duration: "3N/4D",
-            price: 24999,
-            imageUrl:
-              "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-          },
-        ]);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadPackages();
-
-    return () => {
-      mounted = false;
-    };
-  }, [normalizedCountry]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading packages...
-      </div>
-    );
-  }
+  const packages = attractionsPackages[country?.toLowerCase()] || [];
 
   return (
     <div className="bg-gray-50 min-h-screen py-16 px-6">
       <div className="max-w-7xl mx-auto">
+
         <h1 className="text-3xl font-bold mb-10 capitalize">
-          {normalizedCountry} Packages
+          {country} Packages
         </h1>
 
         {packages.length === 0 ? (
@@ -74,12 +25,12 @@ const CountryPackages = () => {
               <div
                 key={pkg.id}
                 onClick={() =>
-                  navigate(`/packages/${normalizedCountry}/${pkg.id}`)
+                  navigate(`/packages/${country}/${pkg.id}`)
                 }
                 className="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
               >
                 <img
-                  src={pkg.imageUrl}
+                  src={pkg.image}
                   alt={pkg.title}
                   className="h-52 w-full object-cover"
                 />
@@ -94,7 +45,7 @@ const CountryPackages = () => {
                   </p>
 
                   <p className="text-blue-600 font-bold text-lg">
-                    ₹{pkg.price?.toLocaleString()}
+                    ₹{pkg.price.toLocaleString()}
                   </p>
                 </div>
               </div>

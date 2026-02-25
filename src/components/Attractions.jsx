@@ -128,7 +128,7 @@ const Attractions = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API_BASE}/api/attractions/popular?city=${activeCountry}`
+          `${API_BASE}/api/attractions/popular?city=${activeCountry}`,
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -141,7 +141,7 @@ const Attractions = () => {
               image: item.imageUrl,
               rating: item.rating.toFixed(1),
               reviews: item.reviews,
-            }))
+            })),
           );
         } else {
           setItems(fallbackData[activeCountry]?.items ?? []);
@@ -210,7 +210,7 @@ const Attractions = () => {
                     key={item.id}
                     onClick={() =>
                       navigate(
-                        `/packages/${activeCountry.toLowerCase()}/${item.id}`
+                        `/packages/${activeCountry.toLowerCase()}/${item.id}`,
                       )
                     }
                     className="min-w-[230px] md:min-w-0 md:w-[260px] bg-white rounded-2xl p-3 shadow-lg cursor-pointer hover:shadow-xl transition"
