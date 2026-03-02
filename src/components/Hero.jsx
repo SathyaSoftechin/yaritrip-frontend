@@ -79,23 +79,27 @@ const Hero = () => {
       item.code.toLowerCase().includes(searchTo.toLowerCase()),
   );
 
-  const handleSearch = () => {
-    if (!fromCity || !destination) {
-      alert("Please select From, Destination and Date.");
-      return;
-    }
+const handleSearch = () => {
+  if (!fromCity || !destination || !date || !rooms) {
+    alert("Please select all fields.");
+    return;
+  }
 
-    if (fromCity.code === destination.code) {
-      alert("Departure and Destination cannot be the same airport.");
-      return;
-    }
+  if (fromCity.code === destination.code) {
+    alert("Departure and Destination cannot be the same.");
+    return;
+  }
 
-    // const formattedDate = date.toISOString().split("T")[0];
+  const formattedDate = date.toISOString().split("T")[0];
 
-    navigate(
-      `/results?from=${fromCity.code}&to=${destination.code}`,
-    );
-  };
+  const [roomCount, guestCount] = rooms
+    .match(/\d+/g)
+    .map(Number);
+
+  navigate(
+    `/results?from=${fromCity.code}&to=${destination.code}&date=${formattedDate}&rooms=${roomCount}&guests=${guestCount}`
+  );
+};
 
   return (
     <section className="relative w-full min-h-[100svh] overflow-visible">
