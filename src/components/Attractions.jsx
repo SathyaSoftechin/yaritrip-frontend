@@ -115,7 +115,6 @@ const exploreImages = {
 const countries = ["Dubai", "India", "Singapore", "Bangkok"];
 const API_BASE = "http://192.168.1.3:8082";
 
-/* -------- COMPONENT -------- */
 const Attractions = () => {
   const navigate = useNavigate();
 
@@ -130,13 +129,15 @@ const Attractions = () => {
         const res = await fetch(
           `${API_BASE}/api/attractions/popular?city=${activeCountry}`,
         );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        if (!res.ok) throw new Error();
+
         const data = await res.json();
 
         if (data && data.length > 0) {
           setItems(
             data.map((item) => ({
-              id: item.id, // MUST come from backend
+              id: item.id,
               title: item.title,
               image: item.imageUrl,
               rating: item.rating.toFixed(1),
@@ -210,7 +211,7 @@ const Attractions = () => {
                     key={item.id}
                     onClick={() =>
                       navigate(
-                        `/packages/${activeCountry.toLowerCase()}/${item.id}`,
+                        `/packages/${activeCountry.toLowerCase()}/${item.id}`
                       )
                     }
                     className="min-w-[230px] md:min-w-0 md:w-[260px] bg-white rounded-2xl p-3 shadow-lg cursor-pointer hover:shadow-xl transition"
@@ -240,7 +241,7 @@ const Attractions = () => {
                   </div>
                 ))}
 
-            {/* Explore More Card */}
+            {/* Explore More */}
             <div className="min-w-[230px] md:w-[260px] relative rounded-2xl overflow-hidden shadow-lg">
               <img
                 src={exploreImage}

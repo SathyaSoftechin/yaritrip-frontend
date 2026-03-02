@@ -6,12 +6,11 @@ import Signup from "../pages/Signup";
 import UserProfile from "../pages/UserProfile";
 import ResultsPage from "../pages/Results";
 
-/* OLD Results-Based Package Page */
+/* UNIVERSAL PACKAGE TEMPLATE */
 import PackageDetails from "../pages/PackageDetails";
 
-/* NEW Country Flow */
+/* COUNTRY FLOW */
 import CountryPackages from "../pages/Packages/CountryPackages";
-import PackageDetail from "../pages/packages/PackageDetail";
 
 /* Checkout Pages */
 import CheckoutLayout from "../pages/checkout/CheckoutLayout";
@@ -31,18 +30,18 @@ const AppRoutes = () => {
       <Route path="/user-profile" element={<UserProfile />} />
       <Route path="/results" element={<ResultsPage />} />
 
-      {/* ================= OLD PACKAGE FLOW (Results Page) ================= */}
+      {/* ================= PACKAGE FLOW ================= */}
+
+      {/* Old Results Page Flow */}
       <Route path="/package/:id" element={<PackageDetails />} />
 
-      {/* ================= NEW COUNTRY PACKAGE FLOW ================= */}
-
-      {/* Important: Country route FIRST */}
+      {/* Country Packages Page */}
       <Route path="/packages/:country" element={<CountryPackages />} />
 
-      {/* Then detailed package route */}
+      {/* Universal Package Details Page */}
       <Route
         path="/packages/:country/:packageId"
-        element={<PackageDetail />}
+        element={<PackageDetails />}
       />
 
       {/* ================= CHECKOUT FLOW ================= */}

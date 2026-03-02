@@ -1,92 +1,48 @@
-import { useState } from "react";
-
-/* ---------------- IMAGE IMPORTS ---------------- */
-import Heritage from "../assets/properties/heritage.png";
-import oberoi from "../assets/properties/oberoi.png";
-import keralaResort from "../assets/properties/kerala-resort.png";
-import goaResort from "../assets/properties/goa-resort.png";
-import kolkataHotel from "../assets/properties/kolkata.png";
-import mumbaiHotel from "../assets/properties/mumbai.png";
-import udaipurHotel from "../assets/properties/udaipur.png";
-
-/* ---------------- DATA STRUCTURE ---------------- */
-
-const propertiesData = {
-  India: {
-    regions: {
-      "North India": [
-        {
-          title: "The Oberoi Amarvilas, Agra",
-          image: oberoi,
-          rating: "9.2/10",
-          nights: "2 days/3 nights",
-          reviews: "2,140 reviews",
-          price: "₹22,500",
-        },
-        {
-          title: "Jaipur Heritage Palace",
-          image: Heritage,
-          rating: "8.9/10",
-          nights: "3 days/4 nights",
-          reviews: "1,820 reviews",
-          price: "₹18,200",
-        },
-      ],
-      "South India": [
-        {
-          title: "Kerala Backwater Resort",
-          image: keralaResort,
-          rating: "9.0/10",
-          nights: "2 days/3 nights",
-          reviews: "3,010 reviews",
-          price: "₹14,800",
-        },
-        {
-          title: "Goa Beachfront Villa",
-          image: goaResort,
-          rating: "8.7/10",
-          nights: "3 days/4 nights",
-          reviews: "2,540 reviews",
-          price: "₹19,900",
-        },
-      ],
-      "East India": [
-        {
-          title: "Kolkata Luxury Stay",
-          image: kolkataHotel,
-          rating: "8.5/10",
-          nights: "2 days/3 nights",
-          reviews: "1,120 reviews",
-          price: "₹12,400",
-        },
-      ],
-      "West India": [
-        {
-          title: "Mumbai Skyline Suites",
-          image: mumbaiHotel,
-          rating: "8.8/10",
-          nights: "2 days/3 nights",
-          reviews: "2,300 reviews",
-          price: "₹20,100",
-        },
-        {
-          title: "Udaipur Palace",
-          image: udaipurHotel,
-          rating: "8.8/10",
-          nights: "2 days/3 nights",
-          reviews: "2,300 reviews",
-          price: "₹20,100",
-        },
-      ],
-    },
-  },
-};
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { packagesData } from "../data/packages.data.js";
 
 const Properties = () => {
-  const [activeRegion, setActiveRegion] = useState("North India");
+  const navigate = useNavigate();
 
-  const regions = Object.keys(propertiesData.India.regions);
-  const listings = propertiesData.India.regions[activeRegion];
+  /* ================= FILTER INDIA PACKAGES ================= */
+  const indiaPackages = useMemo(() => {
+    return packagesData.filter(
+      (pkg) => pkg.country?.toLowerCase() === "india"
+    );
+  }, []);
+
+  /* ================= GET REGIONS DYNAMICALLY ================= */
+  const regions = useMemo(() => {
+    return [
+      ...new Set(
+        indiaPackages
+          .map((pkg) => pkg.region)
+          .filter(Boolean)
+      ),
+    ];
+  }, [indiaPackages]);
+
+  /* ================= SAFE INITIAL REGION ================= */
+  const [activeRegion, setActiveRegion] = useState("");
+
+  useEffect(() => {
+    if (regions.length > 0 && !activeRegion) {
+      setActiveRegion(regions[0]);
+    }
+  }, [regions, activeRegion]);
+
+  /* ================= FILTER BY REGION ================= */
+  const listings = useMemo(() => {
+    return indiaPackages.filter(
+      (pkg) => pkg.region === activeRegion
+    );
+  }, [activeRegion, indiaPackages]);
+
+  /* ================= HANDLE NAVIGATION ================= */
+  const handleNavigate = (property) => {
+    navigate(`/packages/${property.country.toLowerCase()}/${property.id}`);
+  };
 
   return (
     <section className="w-full px-4 py-16 bg-gray-50">
@@ -102,6 +58,7 @@ const Properties = () => {
           {regions.map((region) => (
             <button
               key={region}
+              type="button"
               onClick={() => setActiveRegion(region)}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300
                 ${
@@ -116,14 +73,17 @@ const Properties = () => {
         </div>
 
         {/* Property Cards */}
-        <div
-          key={activeRegion}
-          className="grid md:grid-cols-4 gap-6 animate-region"
-        >
+        <div className="grid md:grid-cols-4 gap-6 animate-region">
           {listings.map((property, index) => (
             <div
-              key={index}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 animate-card"
+              key={property.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => handleNavigate(property)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleNavigate(property);
+              }}
+              className="bg-white cursor-pointer rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 animate-card"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Image */}
@@ -143,20 +103,26 @@ const Properties = () => {
 
                 <div className="flex items-center gap-2 text-xs mb-2">
                   <span className="bg-blue-400 text-white px-2 py-0.5 rounded-md font-semibold">
-                    ⭐{property.rating}
+                    ⭐{property.rating}/10
                   </span>
+
                   <span className="text-orange-500 font-semibold">
-                    {property.nights}
+                    {property.duration}
                   </span>
-                  <span className="text-gray-500">
-                    {property.reviews}
-                  </span>
+
+                  {property.reviews && (
+                    <span className="text-gray-500">
+                      {property.reviews}
+                    </span>
+                  )}
                 </div>
 
                 <div className="text-right">
-                  <span className="text-gray-500 text-sm">Starting from </span>
+                  <span className="text-gray-500 text-sm">
+                    Starting from{" "}
+                  </span>
                   <span className="font-bold text-lg">
-                    {property.price}
+                    ₹{property.price.toLocaleString()}
                   </span>
                 </div>
               </div>

@@ -1,3 +1,11 @@
+import Heritage from "../assets/properties/heritage.png";
+import oberoi from "../assets/properties/oberoi.png";
+import keralaResort from "../assets/properties/kerala-resort.png";
+import goaResort from "../assets/properties/goa-resort.png";
+import kolkataHotel from "../assets/properties/kolkata.png";
+import mumbaiHotel from "../assets/properties/mumbai.png";
+import udaipurHotel from "../assets/properties/udaipur.png";
+
 export const packagesData = [
   // ---------------- DUBAI ----------------
   {
@@ -68,5 +76,84 @@ export const packagesData = [
     price: 19999,
     rating: 4.4,
     image: "/images/bangkok/temple.jpg",
+  },
+
+  // ---------------- INDIA ----------------
+  {
+    id: "india-oberoi-agra",
+    country: "india",
+    region: "North India",
+    title: "The Oberoi Amarvilas, Agra",
+    duration: "2N/3D",
+    price: 22500,
+    rating: 9.2,
+    reviews: "2,140 reviews",
+    image: oberoi,
+  },
+  {
+    id: "india-jaipur-heritage",
+    country: "india",
+    region: "North India",
+    title: "Jaipur Heritage Palace",
+    duration: "3N/4D",
+    price: 18200,
+    rating: 8.9,
+    reviews: "1,820 reviews",
+    image: Heritage,
+  },
+  {
+    id: "india-kerala-backwater",
+    country: "india",
+    region: "South India",
+    title: "Kerala Backwater Resort",
+    duration: "2N/3D",
+    price: 14800,
+    rating: 9.0,
+    reviews: "3,010 reviews",
+    image: keralaResort,
+  },
+  {
+    id: "india-goa-villa",
+    country: "india",
+    region: "South India",
+    title: "Goa Beachfront Villa",
+    duration: "3N/4D",
+    price: 19900,
+    rating: 8.7,
+    reviews: "2,540 reviews",
+    image: goaResort,
+  },
+  {
+    id: "india-kolkata-luxury",
+    country: "india",
+    region: "East India",
+    title: "Kolkata Luxury Stay",
+    duration: "2N/3D",
+    price: 12400,
+    rating: 8.5,
+    reviews: "1,120 reviews",
+    image: kolkataHotel,
+  },
+  {
+    id: "india-mumbai-suites",
+    country: "india",
+    region: "West India",
+    title: "Mumbai Skyline Suites",
+    duration: "2N/3D",
+    price: 20100,
+    rating: 8.8,
+    reviews: "2,300 reviews",
+    image: mumbaiHotel,
+  },
+  {
+    id: "india-udaipur-palace",
+    country: "india",
+    region: "West India",
+    title: "Udaipur Palace",
+    duration: "2N/3D",
+    price: 20100,
+    rating: 8.8,
+    reviews: "2,300 reviews",
+    image: udaipurHotel,
   },
 ];

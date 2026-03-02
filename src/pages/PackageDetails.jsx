@@ -1,57 +1,103 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { packagesData } from "./Results/mockData";
+import { packagesData as attractionsPackages } from "../data/packages.data.js";
+import { packagesData as resultsPackages } from "./Results/mockData.js";
 import { useMemo, useState, useEffect } from "react";
 import { useCheckoutStore } from "../store/checkout.store";
 
 const PackageDetails = () => {
-  const { id } = useParams();
+  const { id, country, packageId } = useParams();
   const navigate = useNavigate();
 
-  const numericId = Number(id);
-  const isValidNumericRoute =
-    id !== undefined && !isNaN(numericId) && String(numericId) === String(id);
+  /* ================= PACKAGE RESOLUTION ================= */
 
-  const [activeTab, setActiveTab] = useState("Overview");
-  const [direction, setDirection] = useState("right");
-  const [openDay, setOpenDay] = useState(null);
+  const rawPackage = useMemo(() => {
+    // ---------- OLD SEARCH RESULTS FLOW ----------
+    if (id) {
+      const numericId = Number(id);
 
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [autoSlide, setAutoSlide] = useState(true);
+      if (!isNaN(numericId)) {
+        const match = resultsPackages.find((item) => item.id === numericId);
+        if (match) return match;
+      }
 
-  const [selectedActivities, setSelectedActivities] = useState([]);
+      const stringMatch = resultsPackages.find(
+        (item) => String(item.id) === String(id),
+      );
+      if (stringMatch) return stringMatch;
+    }
 
-  const { toggleAddon, clearAddons, setPackage } = useCheckoutStore();
+    // ---------- ATTRACTIONS FLOW ----------
+    if (country && packageId) {
+      const match = attractionsPackages.find(
+        (item) => item.country === country && item.id === packageId,
+      );
+      if (match) return match;
+    }
+
+    return null;
+  }, [id, country, packageId]);
+
+  /* ================= NORMALIZATION LAYER ================= */
 
   const pkg = useMemo(() => {
-    if (!isValidNumericRoute) return null;
-    return packagesData.find((item) => item.id === numericId);
-  }, [numericId, isValidNumericRoute]);
+    if (!rawPackage) return null;
 
-  useEffect(() => {
-    if (pkg) {
-      clearAddons();
-      setSelectedActivities([]);
-      setPackage(pkg);
+    // Detect if coming from Attractions data
+    const isAttraction = rawPackage.duration !== undefined;
+
+    if (isAttraction) {
+      const nights = parseInt(rawPackage.duration?.split("N")[0]) || 3;
+
+      return {
+        ...rawPackage,
+        nights,
+        location: rawPackage.country?.toUpperCase(),
+        images: [
+          rawPackage.image,
+          rawPackage.image,
+          rawPackage.image,
+          rawPackage.image,
+        ],
+      };
     }
-  }, [pkg, clearAddons, setPackage]);
 
-  if (!isValidNumericRoute) return null;
+    // From Search Results mockData
+    return {
+      ...rawPackage,
+      nights: rawPackage.nights || 3,
+      location: rawPackage.location,
+      images: rawPackage.images || [rawPackage.image],
+    };
+  }, [rawPackage]);
+
+  /* ================= SAFE FALLBACK ================= */
 
   if (!pkg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <button
-          onClick={() => navigate("/results")}
+          onClick={() => navigate(-1)}
           className="bg-blue-600 text-white px-6 py-2 rounded-full"
         >
-          Back to Results
+          Go Back
         </button>
       </div>
     );
   }
 
-  const images = pkg.images || [pkg.image];
+  /* ================= STATE ================= */
+
+  const [activeTab, setActiveTab] = useState("Overview");
+  const [direction, setDirection] = useState("right");
+  const [selectedActivities, setSelectedActivities] = useState([]);
+
+  const { toggleAddon, clearAddons, setPackage } = useCheckoutStore();
+
+  useEffect(() => {
+    clearAddons();
+    setSelectedActivities([]);
+    setPackage(pkg);
+  }, [pkg, clearAddons, setPackage]);
 
   const tabs = [
     "Overview",
@@ -68,41 +114,18 @@ const PackageDetails = () => {
     setActiveTab(tab);
   };
 
-  /* ---------- ACTIVITY LIST ---------- */
+  /* ================= ACTIVITIES ================= */
+
   const activitiesList = [
-    {
-      id: 1,
-      name: "Desert Safari Experience",
-      price: 3500,
-      image:
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-    },
-    {
-      id: 2,
-      name: "Luxury Yacht Cruise",
-      price: 5200,
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-    },
-    {
-      id: 3,
-      name: "Helicopter City Tour",
-      price: 8900,
-      image:
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    },
-    {
-      id: 4,
-      name: "Adventure Water Sports",
-      price: 4200,
-      image:
-        "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b",
-    },
+    { id: 1, name: "Desert Safari Experience", price: 3500 },
+    { id: 2, name: "Luxury Yacht Cruise", price: 5200 },
+    { id: 3, name: "Helicopter City Tour", price: 8900 },
+    { id: 4, name: "Adventure Water Sports", price: 4200 },
   ];
 
   const handleActivityToggle = (activity, day) => {
     const exists = selectedActivities.find(
-      (item) => item.id === activity.id && item.day === day
+      (item) => item.id === activity.id && item.day === day,
     );
 
     const activityForStore = {
@@ -113,55 +136,26 @@ const PackageDetails = () => {
 
     if (exists) {
       setSelectedActivities((prev) =>
-        prev.filter(
-          (item) =>
-            !(item.id === activity.id && item.day === day)
-        )
+        prev.filter((item) => !(item.id === activity.id && item.day === day)),
       );
       toggleAddon(activityForStore);
     } else {
-      setSelectedActivities((prev) => [
-        ...prev,
-        { ...activity, day },
-      ]);
+      setSelectedActivities((prev) => [...prev, { ...activity, day }]);
       toggleAddon(activityForStore);
     }
   };
 
   const activitiesTotal = selectedActivities.reduce(
     (sum, item) => sum + item.price,
-    0
+    0,
   );
 
   const totalPrice = pkg.price + activitiesTotal;
 
-  /* ---------- LIGHTBOX ---------- */
-  const openLightbox = (index) => {
-    setCurrentImageIndex(index);
-    setLightboxOpen(true);
-    setAutoSlide(true);
-  };
-
-  const closeLightbox = () => {
-    setLightboxOpen(false);
-    setAutoSlide(false);
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === images.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  useEffect(() => {
-    if (!lightboxOpen || !autoSlide) return;
-    const interval = setInterval(nextImage, 3000);
-    return () => clearInterval(interval);
-  }, [lightboxOpen, autoSlide]);
+  /* ================= UI ================= */
 
   return (
     <div className="min-h-screen bg-gray-100 pb-16 mt-20">
-
       {/* HEADER */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">
@@ -175,24 +169,21 @@ const PackageDetails = () => {
       {/* GALLERY */}
       <div className="max-w-7xl mx-auto px-6 mt-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {images.map((img, index) => (
+          {pkg.images.map((img, index) => (
             <img
               key={index}
               src={img}
               alt=""
-              onClick={() => openLightbox(index)}
               className={`${
-                index === 0
-                  ? "col-span-2 row-span-2 h-64 md:h-80"
-                  : "h-40"
-              } w-full object-cover rounded-xl cursor-pointer hover:scale-105 transition`}
+                index === 0 ? "col-span-2 row-span-2 h-64 md:h-80" : "h-40"
+              } w-full object-cover rounded-xl`}
             />
           ))}
         </div>
 
-        {/* TAB NAVIGATION RESTORED */}
+        {/* TABS */}
         <div className="sticky top-16 bg-gray-100 pt-6 z-10">
-          <div className="relative flex gap-6 border-b border-gray-300 overflow-x-auto">
+          <div className="flex gap-6 border-b border-gray-300 overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -213,22 +204,14 @@ const PackageDetails = () => {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <div className="max-w-7xl mx-auto px-6 mt-10 grid md:grid-cols-3 gap-8">
+        {/* LEFT CONTENT */}
         <div className="md:col-span-2">
-          <div
-            key={activeTab}
-            className={`transition-all duration-300 ${
-              direction === "right"
-                ? "animate-slideRight"
-                : "animate-slideLeft"
-            } bg-white rounded-2xl shadow p-6`}
-          >
+          <div className="bg-white rounded-2xl shadow p-6">
             {activeTab === "Overview" && (
               <>
-                <h2 className="text-lg font-semibold mb-4">
-                  Package Overview
-                </h2>
+                <h2 className="text-lg font-semibold mb-4">Package Overview</h2>
                 <p className="text-gray-600">
                   Enjoy a premium {pkg.nights}-night getaway in{" "}
                   <strong>{pkg.location}</strong>.
@@ -237,11 +220,9 @@ const PackageDetails = () => {
             )}
 
             {activeTab === "Itinerary" &&
-              Array.from({ length: pkg.nights }).map((_, index) => (
-                <div key={index} className="border rounded-xl mb-4 p-4">
-                  <h3 className="font-semibold">
-                    Day {index + 1}
-                  </h3>
+              Array.from({ length: pkg.nights }, (_, i) => (
+                <div key={i} className="border rounded-xl mb-4 p-4">
+                  <h3 className="font-semibold">Day {i + 1}</h3>
                   <p className="text-sm text-gray-600">
                     Arrival, sightseeing and curated experiences.
                   </p>
@@ -250,123 +231,123 @@ const PackageDetails = () => {
 
             {activeTab === "Transfers" && (
               <p className="text-gray-600">
-                Airport pickup and drop with private transfers.
+                Airport pickup and private transfers included.
               </p>
             )}
 
             {activeTab === "Rooms & Hotels" && (
               <p className="text-gray-600">
-                4-star luxury hotel stay with breakfast.
+                4-star luxury stay with breakfast included.
               </p>
             )}
 
             {activeTab === "Activities" && (
-              <>
-                <h2 className="text-lg font-semibold mb-6">
-                  Add Activities
-                </h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {activitiesList.map((activity) => (
+                  <div key={activity.id} className="border rounded-xl p-4">
+                    <h4 className="font-semibold">{activity.name}</h4>
+                    <p className="text-sm text-gray-500 mb-3">
+                      ₹{activity.price.toLocaleString()}
+                    </p>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  {activitiesList.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="border rounded-xl overflow-hidden shadow"
-                    >
-                      <img
-                        src={activity.image}
-                        alt={activity.name}
-                        className="h-40 w-full object-cover"
-                      />
-
-                      <div className="p-4 space-y-3">
-                        <h4 className="font-semibold">
-                          {activity.name}
-                        </h4>
-
-                        <p className="text-sm text-gray-500">
-                          ₹{activity.price.toLocaleString()}
-                        </p>
-
-                        <select
-                          className="w-full border rounded-lg p-2 text-sm"
-                          onChange={(e) =>
-                            handleActivityToggle(
-                              activity,
-                              Number(e.target.value)
-                            )
-                          }
-                        >
-                          <option value="">
-                            Select Day
-                          </option>
-                          {Array.from(
-                            { length: pkg.nights },
-                            (_, i) => (
-                              <option key={i} value={i}>
-                                Day {i + 1}
-                              </option>
-                            )
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
+                    {Array.from({ length: pkg.nights }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleActivityToggle(activity, i)}
+                        className="mr-2 mt-2 px-3 py-1 text-xs bg-blue-100 rounded"
+                      >
+                        Day {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
 
         {/* PRICE CARD */}
         <div className="bg-white rounded-2xl shadow p-6 h-fit sticky top-28">
-          <h3 className="text-lg font-semibold">
-            Starting From
-          </h3>
+          <h3 className="text-lg font-semibold">Starting From</h3>
 
           <div className="mt-3 text-3xl font-bold">
             ₹{totalPrice.toLocaleString()}
-            <span className="text-sm text-gray-500">
-              {" "}
-              /person
-            </span>
+            <span className="text-sm text-gray-500"> /person</span>
           </div>
 
-          {activitiesTotal > 0 && (
-            <div className="mt-2 text-sm text-green-600 font-medium">
-              + ₹{activitiesTotal.toLocaleString()} added
+          {/* ---------------- SELECTED ACTIVITIES SUMMARY ---------------- */}
+          {selectedActivities.length > 0 && (
+            <div className="mt-6 border-t pt-4 space-y-4">
+              <p className="text-sm font-semibold text-gray-700">
+                Selected Activities
+              </p>
+
+              {selectedActivities.map((activity) => (
+                <div
+                  key={`${activity.id}-${activity.day}`}
+                  className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {activity.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Day {activity.day + 1}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-semibold text-green-600">
+                      ₹{activity.price.toLocaleString()}
+                    </span>
+
+                    <button
+                      onClick={() => {
+                        const activityForStore = {
+                          ...activity,
+                          id: `${activity.id}-${activity.day}`,
+                          day: activity.day,
+                        };
+
+                        setSelectedActivities((prev) =>
+                          prev.filter(
+                            (item) =>
+                              !(
+                                item.id === activity.id &&
+                                item.day === activity.day
+                              ),
+                          ),
+                        );
+
+                        toggleAddon(activityForStore);
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700 font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex justify-between text-sm font-semibold text-green-700 border-t pt-3">
+                <span>Total Add-ons</span>
+                <span>₹{activitiesTotal.toLocaleString()}</span>
+              </div>
             </div>
           )}
 
           <button
-            onClick={() =>
-              navigate(`/checkout/${pkg.id}/travellers`)
-            }
+            onClick={() => navigate(`/checkout/${pkg.id}/travellers`)}
             className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
           >
             Proceed to Booking
           </button>
+
+          <p className="mt-6 text-xs text-red-500">
+            <b>*Prices may vary depending on availability.</b>
+          </p>
         </div>
       </div>
-
-      {/* Slide Animation */}
-      <style>
-        {`
-          @keyframes slideRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-          }
-          @keyframes slideLeft {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-          }
-          .animate-slideRight {
-            animation: slideRight 0.3s ease-out both;
-          }
-          .animate-slideLeft {
-            animation: slideLeft 0.3s ease-out both;
-          }
-        `}
-      </style>
     </div>
   );
 };
