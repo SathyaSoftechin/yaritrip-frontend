@@ -115,6 +115,181 @@
 // };
 
 // export default Results;
+// import { useState, useMemo, useEffect } from "react";
+// import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+// import FiltersSidebar from "./FiltersSidebar";
+// import SortingBar from "./SortingBar";
+// import Pagination from "./Pagination";
+// import PackageCard from "../../components/PackageCard";
+
+// const Results = () => {
+//   const [maxPrice, setMaxPrice] = useState(8000000);
+//   const [selectedNights, setSelectedNights] = useState("");
+//   const [sort, setSort] = useState("");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [packages, setPackages] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const navigate = useNavigate();
+
+//   const itemsPerPage = 4;
+
+//   /* -------- READ SEARCH PARAMS -------- */
+//   const [searchParams] = useSearchParams();
+//   const from = searchParams.get("from");
+//   const to = searchParams.get("to");
+//   const date = searchParams.get("date");
+//   const rooms = searchParams.get("rooms");
+//   const guests = searchParams.get("guests");
+
+//   /* -------- FETCH FROM BACKEND -------- */
+// useEffect(() => {
+//   const fetchPackages = async () => {
+//     if (!from || !to) {
+//       setLoading(false);
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+
+//       // Default values if not present in URL
+//       const formattedDate =
+//         date || new Date().toISOString().split("T")[0];
+
+//       const totalRooms = rooms || 1;
+//       const totalGuests = guests || 1;
+
+//       console.log("Final Params:", {
+//         from,
+//         to,
+//         formattedDate,
+//         totalRooms,
+//         totalGuests,
+//       });
+
+//       const response = await fetch(
+//         `http://localhost:8082/api/packages/search?fromCode=${from}&toCode=${to}&date=${formattedDate}&rooms=${totalRooms}&guests=${totalGuests}`
+//       );
+
+//       if (!response.ok) {
+//         throw new Error("Failed to fetch packages");
+//       }
+
+//       const data = await response.json();
+//       console.log("Fetched packages:", data);
+
+//       setPackages(data);
+//     } catch (error) {
+//       console.error("Fetch error:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchPackages();
+// }, [from, to, date, rooms, guests]);
+
+//   /* -------- FILTER + SORT -------- */
+//   const filteredData = useMemo(() => {
+//     let data = [...packages];
+
+//     data = data.filter((pkg) => pkg.price <= maxPrice);
+
+//     if (selectedNights) {
+//       data = data.filter((pkg) => pkg.nights === Number(selectedNights));
+//     }
+
+//     if (sort === "priceLow") {
+//       data = [...data].sort((a, b) => a.price - b.price);
+//     } else if (sort === "priceHigh") {
+//       data = [...data].sort((a, b) => b.price - a.price);
+//     } else if (sort === "rating") {
+//       data = [...data].sort((a, b) => b.rating - a.rating);
+//     }
+//     console.log("Packages state:", packages);
+//     console.log("Filtered data:", data);
+
+//     return data;
+//   }, [packages, maxPrice, selectedNights, sort]);
+
+//   /* -------- PAGINATION -------- */
+//   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+//   const paginatedData = filteredData.slice(
+//     (currentPage - 1) * itemsPerPage,
+//     currentPage * itemsPerPage
+//   );
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 px-6 py-10">
+//       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+//         {/* Sidebar */}
+//         <FiltersSidebar
+//           maxPrice={maxPrice}
+//           setMaxPrice={setMaxPrice}
+//           selectedNights={selectedNights}
+//           setSelectedNights={setSelectedNights}
+//         />
+
+//         {/* Results Section */}
+//         <div className="md:col-span-3">
+//           {/* Optional: Show Search Info */}
+//           {(from || to || date) && (
+//             <div className="mb-6 bg-white p-4 rounded-xl shadow-sm mt-20">
+//               <p className="text-sm text-gray-600">
+//                 Showing Available Packages
+//                 {from && (
+//                   <>
+//                     {" "}
+//                     from <span className="font-semibold">{from}</span>
+//                   </>
+//                 )}
+//                 {to && (
+//                   <>
+//                     {" "}
+//                     to <span className="font-semibold">{to}</span>
+//                   </>
+//                 )}
+//                 {/* {date && <> on <span className="font-semibold">{date}</span></>} */}
+//               </p>
+//             </div>
+//           )}
+
+//           <SortingBar sort={sort} setSort={setSort} />
+//           {loading && (
+//             <div className="text-center py-10 text-gray-500">
+//                 Loading packages...
+//             </div>
+//         )}
+//           {!loading && (
+//           <div className="grid sm:grid-cols-3 gap-6 mt-6">
+//             {paginatedData.length > 0 ? (
+//               paginatedData.map((pkg) => (
+//                 <PackageCard key={pkg.id} pkg={pkg} />
+//               ))
+//             ) : (
+//               <div className="col-span-3 text-center py-16 text-gray-500">
+//                 No packages found for this search.
+//               </div>
+//             )}
+//           </div>
+//         )}
+
+//           {totalPages > 1 && (
+//             <Pagination
+//               currentPage={currentPage}
+//               setCurrentPage={setCurrentPage}
+//               totalPages={totalPages}
+//             />
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Results;
+
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import FiltersSidebar from "./FiltersSidebar";
