@@ -1,4 +1,5 @@
-import Dubai from "../../assets/packages/dubai.png";
+// import Dubai from "../../assets/packages/dubai.png";
+import dubai from "../../assets/packages/dubai.png";
 import Maldives from "../../assets/packages/maldives.png";
 import Kashmir from "../../assets/packages/kashmir.png";
 import Singapore from "../../assets/packages/singapore.png";
@@ -19,8 +20,8 @@ export const packagesData = [
     nights: 6,
     rating: 4.7,
     price: 80000,
-    image: Dubai,
-    images: [Dubai, Singapore, Bangkok, KualaLumpur],
+    image: dubai,
+    images: [dubai, Singapore, Bangkok, KualaLumpur],
   },
   {
     id: 2,
@@ -56,7 +57,7 @@ export const packagesData = [
     rating: 4.8,
     price: 54999,
     image: Singapore,
-    images: [Singapore, Dubai, Bangkok, Bali],
+    images: [Singapore, dubai, Bangkok, Bali],
   },
   {
     id: 5,
@@ -68,7 +69,7 @@ export const packagesData = [
     rating: 4.8,
     price: 34999,
     image: KualaLumpur,
-    images: [KualaLumpur, Singapore, Bangkok, Dubai],
+    images: [KualaLumpur, Singapore, Bangkok, dubai],
   },
   {
     id: 6,
@@ -92,7 +93,7 @@ export const packagesData = [
     rating: 4.8,
     price: 64999,
     image: Bali,
-    images: [Bali, Maldives, Singapore, Dubai],
+    images: [Bali, Maldives, Singapore, dubai],
   },
   {
     id: 8,
@@ -116,7 +117,7 @@ export const packagesData = [
     rating: 4.8,
     price: 64999,
     image: Hyderabad,
-    images: [Hyderabad, Delhi, Singapore, Dubai],
+    images: [Hyderabad, Delhi, Singapore, dubai],
   },
   {
     id: 10,
