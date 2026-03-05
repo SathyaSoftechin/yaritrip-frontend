@@ -2,25 +2,25 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* -------- IMAGE IMPORTS -------- */
-import dubaiGlobal from "../assets/attractions/global-village.png";
-import dubaiBurj from "../assets/attractions/burj-khalifa.jpg";
-import dubaiYacht from "../assets/attractions/yacht-cruise.jpg";
+import dubaiGlobal from "../assets/Attractions/global-village.png";
+import dubaiBurj from "../assets/Attractions/burj-khalifa.jpg";
+import dubaiYacht from "../assets/Attractions/yacht-cruise.jpg";
 
-import indiaTaj from "../assets/attractions/indiaTaj.png";
-import indiaJaipur from "../assets/attractions/indiaJaipur.png";
-import indiaKerala from "../assets/attractions/indiaKerala.png";
+import indiaTaj from "../assets/Attractions/indiaTaj.png";
+import indiaJaipur from "../assets/Attractions/indiaJaipur.png";
+import indiaKerala from "../assets/Attractions/indiaKerala.png";
 
-import singaporeSky from "../assets/attractions/singaporeSky.png";
-import singaporeGarden from "../assets/attractions/singaporeGarden.png";
+import singaporeSky from "../assets/Attractions/singaporeSky.png";
+import singaporeGarden from "../assets/Attractions/singaporeGarden.png";
 
-import bangkokTemple from "../assets/attractions/bangkokTemple.png";
+import bangkokTemple from "../assets/Attractions/bangkokTemple.png";
 
-import exploreDubai from "../assets/attractions/explore.jpg";
-import exploreIndia from "../assets/attractions/indiaKerala.png";
-import exploreSingapore from "../assets/attractions/singaporeSky.png";
-import exploreBangkok from "../assets/attractions/bangkokTemple.png";
+import exploreDubai from "../assets/Attractions/explore.jpg";
+import exploreIndia from "../assets/Attractions/indiaKerala.png";
+import exploreSingapore from "../assets/Attractions/singaporeSky.png";
+import exploreBangkok from "../assets/Attractions/bangkokTemple.png";
 
-import attractionsBg from "../assets/attractions/attractions-bg.jpeg";
+import attractionsBg from "../assets/Attractions/attractions-bg.jpeg";
 
 /* -------- STATIC FALLBACK DATA -------- */
 const fallbackData = {
