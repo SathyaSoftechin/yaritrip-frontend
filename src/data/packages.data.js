@@ -1,10 +1,10 @@
-import Heritage from "../assets/properties/heritage.png";
-import oberoi from "../assets/properties/oberoi.png";
-import keralaResort from "../assets/properties/kerala-resort.png";
-import goaResort from "../assets/properties/goa-resort.png";
-import kolkataHotel from "../assets/properties/kolkata.png";
-import mumbaiHotel from "../assets/properties/mumbai.png";
-import udaipurHotel from "../assets/properties/udaipur.png";
+import Heritage from "../assets/Properties/heritage.png";
+import oberoi from "../assets/Properties/oberoi.png";
+import keralaResort from "../assets/Properties/kerala-resort.png";
+import goaResort from "../assets/Properties/goa-resort.png";
+import kolkataHotel from "../assets/Properties/kolkata.png";
+import mumbaiHotel from "../assets/Properties/mumbai.png";
+import udaipurHotel from "../assets/Properties/udaipur.png";
 
 export const packagesData = [
   // ---------------- DUBAI ----------------
