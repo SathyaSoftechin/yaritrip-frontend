@@ -1,14 +1,14 @@
 // import Dubai from "../../assets/packages/dubai.png";
-import dubai from "../../assets/packages/dubai.png";
-import Maldives from "../../assets/packages/maldives.png";
-import Kashmir from "../../assets/packages/kashmir.png";
-import Singapore from "../../assets/packages/singapore.png";
-import KualaLumpur from "../../assets/packages/kualalumpur.png";
-import Vietnam from "../../assets/packages/vietnam.png";
-import Bali from "../../assets/packages/bali.png";
-import Bangkok from "../../assets/packages/bangkok.png";
-import Hyderabad from "../../assets/packages/hyderabad.png";
-import Delhi from "../../assets/packages/delhi.png";
+import dubai from "../../assets/Packages/dubai.png";
+import Maldives from "../../assets/Packages/maldives.png";
+import Kashmir from "../../assets/Packages/kashmir.png";
+import Singapore from "../../assets/Packages/singapore.png";
+import KualaLumpur from "../../assets/Packages/kualalumpur.png";
+import Vietnam from "../../assets/Packages/vietnam.png";
+import Bali from "../../assets/Packages/bali.png";
+import Bangkok from "../../assets/Packages/bangkok.png";
+import Hyderabad from "../../assets/Packages/hyderabad.png";
+import Delhi from "../../assets/Packages/delhi.png";
 
 export const packagesData = [
   {
