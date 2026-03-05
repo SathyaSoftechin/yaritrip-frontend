@@ -80,7 +80,7 @@ import ResultsPage from "../pages/Results";
 import PackageDetails from "../pages/PackageDetails";
 
 /* NEW Country Flow */
-import CountryPackages from "../pages/Packages/CountryPackages";
+import CountryPackages from "../pages/packages/CountryPackages";
 
 
 /* Checkout Pages */

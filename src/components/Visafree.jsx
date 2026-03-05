@@ -83,7 +83,7 @@ const visaData = {
     { name: "Belarus", type: "Restricted" },
     { name: "Kazakhstan", type: "Visa-Free" },
   ],
-  "North America / Caribbean": [
+  "North America": [
     { name: "Barbados", type: "Visa-Free" },
     { name: "Dominica", type: "Visa-Free" },
     // { name: "Grenada", type: "Visa-Free" },
