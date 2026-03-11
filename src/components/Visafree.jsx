@@ -69,13 +69,13 @@ const visaData = {
     { name: "Iran", type: "VoA" },
   ],
   Africa: [
-    // { name: "Mauritius", type: "Visa-Free" },
-    // { name: "Seychelles", type: "Visa-Free" },
+    { name: "Mauritius", type: "Visa-Free" },
+    { name: "Seychelles", type: "Visa-Free" },
     { name: "Kenya", type: "ETA" },
     { name: "Senegal", type: "Visa-Free" },
     { name: "Rwanda", type: "Visa-Free" },
-    // { name: "Angola", type: "Visa-Free" },
-    // { name: "Tunisia", type: "Visa-Free" },
+    { name: "Angola", type: "Visa-Free" },
+    { name: "Tunisia", type: "Visa-Free" },
     { name: "Madagascar", type: "VoA" },
   ],
   Europe: [
@@ -86,12 +86,12 @@ const visaData = {
   "North America": [
     { name: "Barbados", type: "Visa-Free" },
     { name: "Dominica", type: "Visa-Free" },
-    // { name: "Grenada", type: "Visa-Free" },
-    // { name: "Haiti", type: "Visa-Free" },
+    { name: "Grenada", type: "Visa-Free" },
+    { name: "Haiti", type: "Visa-Free" },
     { name: "Jamaica", type: "Visa-Free" },
     { name: "Montserrat", type: "Visa-Free" },
-    // { name: "St. Kitts and Nevis", type: "Visa-Free" },
-    // { name: "St. Vincent & Grenadines", type: "Visa-Free" },
+    { name: "St. Kitts and Nevis", type: "Visa-Free" },
+    { name: "St. Vincent & Grenadines", type: "Visa-Free" },
     { name: "British Virgin Islands", type: "Visa-Free" },
   ],
   "South America": [
@@ -105,9 +105,9 @@ const visaData = {
     { name: "Micronesia", type: "Visa-Free" },
     { name: "Vanuatu", type: "Visa-Free" },
     { name: "Kiribati", type: "Visa-Free" },
-    // { name: "Niue", type: "Visa-Free" },
+    { name: "Niue", type: "Visa-Free" },
     { name: "Samoa", type: "VoA" },
-    // { name: "Tuvalu", type: "VoA" },
+    { name: "Tuvalu", type: "VoA" },
   ],
 };
 
@@ -137,7 +137,7 @@ const VisaFree = () => {
 
         <div className="relative z-10 p-10 text-white">
           <h2 className="text-3xl font-semibold mb-8">
-            Visa-Free Destinations for Indians 20<span className="text-red-600 font-bold text-4xl">26</span>
+            Visa-Free Destinations for Indians 20<span className="text-red-600 font-bold text-4xl">26</span> <span className="text-sm">*Just for Information*</span>
           </h2>
 
           {/* Tabs */}
@@ -190,6 +190,10 @@ const VisaFree = () => {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-10 text-center font-medium">
+            *ETA - Electronic Travel Authorization* <br />
+            *VoA - Visa on Arrival*
           </div>
         </div>
       </div>

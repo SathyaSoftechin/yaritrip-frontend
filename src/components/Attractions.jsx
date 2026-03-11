@@ -113,7 +113,7 @@ const exploreImages = {
 };
 
 const countries = ["Dubai", "India", "Singapore", "Bangkok"];
-const API_BASE = "http://192.168.1.3:8082";
+const API_BASE = "http://192.168.1.2:8082";
 
 const Attractions = () => {
   const navigate = useNavigate();

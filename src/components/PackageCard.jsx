@@ -46,7 +46,7 @@ const PackageCard = ({ pkg }) => {
           {pkg.title}
         </h3>
 
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-900 mt-1">
           {pkg.location} • {pkg.nights} Nights
         </p>
 
@@ -54,12 +54,12 @@ const PackageCard = ({ pkg }) => {
 
         <div className="flex justify-between items-center">
           <span className="text-xs text-gray-500">
-            Package Starting from
+            Package Starting <br />from
           </span>
 
-          <span className="font-semibold text-lg text-gray-900">
+          <span className="font-semibold text-md text-gray-900">
             ₹{pkg.price.toLocaleString()}
-            <span className="text-xs text-gray-500"> /person</span>
+            <span className="text-xs text-gray-900"> /person</span>
           </span>
         </div>
       </div>
