@@ -113,7 +113,7 @@ const exploreImages = {
 };
 
 const countries = ["Dubai", "India", "Singapore", "Bangkok"];
-const API_BASE = "http://192.168.1.2:8082";
+const API_BASE = "http://192.168.1.27:8082";
 
 const Attractions = () => {
   const navigate = useNavigate();
@@ -127,7 +127,7 @@ const Attractions = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API_BASE}/api/attractions/popular?city=${activeCountry}`,
+          `${API_BASE}/api/attractions/popular?city=${activeCountry}`
         );
 
         if (!res.ok) throw new Error();
@@ -142,7 +142,7 @@ const Attractions = () => {
               image: item.imageUrl,
               rating: item.rating.toFixed(1),
               reviews: item.reviews,
-            })),
+            }))
           );
         } else {
           setItems(fallbackData[activeCountry]?.items ?? []);
@@ -174,27 +174,25 @@ const Attractions = () => {
             Popular Packages with Great Attractions.
           </h2>
 
+          {/* Country Tabs */}
           <div className="flex gap-3 mb-8 overflow-x-auto scrollbar-hide">
             {countries.map((country) => (
               <button
                 key={country}
                 onClick={() => setActiveCountry(country)}
-                className={`px-5 py-2 whitespace-nowrap rounded-full text-sm font-medium transition
-                  ${
-                    activeCountry === country
-                      ? "bg-black text-white"
-                      : "bg-white text-black"
-                  }`}
+                className={`px-5 py-2 whitespace-nowrap rounded-full text-sm font-medium transition ${
+                  activeCountry === country
+                    ? "bg-black text-white"
+                    : "bg-white text-black"
+                }`}
               >
                 {country}
               </button>
             ))}
           </div>
 
-          <div
-            key={activeCountry}
-            className="flex gap-5 md:gap-6 overflow-x-auto md:overflow-visible animate-slide-in scrollbar-hide"
-          >
+          {/* Cards */}
+          <div className="flex gap-5 md:gap-6 overflow-x-auto md:overflow-visible scrollbar-hide">
             {loading
               ? Array.from({ length: 3 }).map((_, idx) => (
                   <div
@@ -209,11 +207,7 @@ const Attractions = () => {
               : items.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() =>
-                      navigate(
-                        `/packages/${activeCountry.toLowerCase()}/${item.id}`
-                      )
-                    }
+                    onClick={() => navigate(`/attractions/${item.id}`)}
                     className="min-w-[230px] md:min-w-0 md:w-[260px] bg-white rounded-2xl p-3 shadow-lg cursor-pointer hover:shadow-xl transition"
                   >
                     <div className="rounded-xl overflow-hidden">
@@ -248,6 +242,7 @@ const Attractions = () => {
                 alt="Explore more"
                 className="absolute inset-0 w-full h-full object-cover"
               />
+
               <div className="absolute inset-0 bg-black/50" />
 
               <div className="relative z-10 p-4 h-full flex flex-col justify-end text-white">
@@ -265,18 +260,6 @@ const Attractions = () => {
           </div>
         </div>
       </div>
-
-      <style>
-        {`
-          @keyframes slideIn {
-            from { opacity: 0; transform: translateY(40px); }
-            to   { opacity: 1; transform: translateY(0); }
-          }
-          .animate-slide-in {
-            animation: slideIn 0.45s ease-out both;
-          }
-        `}
-      </style>
     </section>
   );
 };

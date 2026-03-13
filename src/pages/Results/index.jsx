@@ -343,7 +343,7 @@ useEffect(() => {
       });
 
       const response = await fetch(
-        `http://192.168.1.2:8082/api/packages/search?fromCode=${from}&toCode=${to}&date=${formattedDate}&rooms=${totalRooms}&guests=${totalGuests}`
+        `http://192.168.1.27:8082/api/packages/search?fromCode=${from}&toCode=${to}&date=${formattedDate}&rooms=${totalRooms}&guests=${totalGuests}`
       );
 
       if (!response.ok) {

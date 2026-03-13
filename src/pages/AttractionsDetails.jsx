@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useCheckoutStore } from "../store/checkout.store";
 import ImageWithPlaceholder from "../components/ImageWithPlaceholder";
 
-const PackageDetails = () => {
+const AttractionsDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -355,4 +355,4 @@ const PackageDetails = () => {
   );
 };
 
-export default PackageDetails;
+export default AttractionsDetails;
