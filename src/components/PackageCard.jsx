@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const PackageCard = ({ pkg }) => {
+  console.log("PACKAGE CARD DATA:", pkg);
   const [wishlisted, setWishlisted] = useState(false);
   const navigate = useNavigate();
 
@@ -18,12 +19,11 @@ const PackageCard = ({ pkg }) => {
                  cursor-pointer"
     >
       <div className="relative group overflow-hidden">
-        <img
-          src={pkg.image}
-          alt={pkg.title}
-          className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-
+<img
+  src={pkg.image}
+  alt={pkg.title}
+  className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105"
+/>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -46,7 +46,7 @@ const PackageCard = ({ pkg }) => {
           {pkg.title}
         </h3>
 
-        <p className="text-sm text-gray-900 mt-1">
+        <p className="text-sm text-gray-500 mt-1">
           {pkg.location} • {pkg.nights} Nights
         </p>
 
@@ -54,12 +54,12 @@ const PackageCard = ({ pkg }) => {
 
         <div className="flex justify-between items-center">
           <span className="text-xs text-gray-500">
-            Package Starting <br />from
+            Package Starting from
           </span>
 
-          <span className="font-semibold text-md text-gray-900">
+          <span className="font-semibold text-lg text-gray-900">
             ₹{pkg.price.toLocaleString()}
-            <span className="text-xs text-gray-900"> /person</span>
+            <span className="text-xs text-gray-500"> /person</span>
           </span>
         </div>
       </div>

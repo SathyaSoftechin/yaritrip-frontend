@@ -1,12 +1,14 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useCheckoutStore } from "../../store/checkout.store";
-import { packagesData } from "../Results/mockData";
 import { useEffect, useState } from "react";
 
+const BASE_URL = "http://localhost:8082/api";
+ 
 const TravellersStep = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // bookingId
   const navigate = useNavigate();
-
+  const { state } = useLocation();
+ 
   const {
     travellers,
     addons,
@@ -16,37 +18,56 @@ const TravellersStep = () => {
     setPackage,
     getTotal,
   } = useCheckoutStore();
-
-  const pkg = packagesData.find((p) => p.id === Number(id));
+ 
+  const [pkg, setPkg] = useState(state?.pkg || null);
+  const [loading, setLoading] = useState(!state?.pkg);
   const [animatedTotal, setAnimatedTotal] = useState(0);
+ 
+  // ✅ Fetch booking if pkg not passed via state
+  useEffect(() => {
+    if (pkg) return;
 
+    const fetchBooking = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/bookings/${id}`);
+
+        if (!res.ok) throw new Error("Booking not found");
+
+        const data = await res.json();
+
+        const packageData = data.package;
+
+        if (!packageData) {
+          console.error("Package missing in booking");
+          setLoading(false);
+          return;
+        }
+
+        setPkg(packageData);
+        setPackage(packageData);
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooking();
+  }, [id, pkg, setPackage]); 
+ 
   useEffect(() => {
     if (pkg) setPackage(pkg);
   }, [pkg, setPackage]);
 
-  if (!pkg) return <div className="p-10">Package not found</div>;
-
-  const isAbroad = pkg.category === "Abroad";
-
-  const adults = travellers.filter((t) => t.type === "Adult");
-  const children = travellers.filter((t) => t.type === "Child");
-
-  const adultTotal = adults.length * pkg.price;
-  const childTotal = children.length * (pkg.price * 0.75);
-
-  const addonsTotal = addons.reduce(
-    (sum, addon) => sum + addon.price,
-    0
-  );
-
-  const totalAmount = travellers.length === 0 ? 0 : getTotal();
+  // ✅ 🔥 FIXED: moved ABOVE condition (NO OTHER CHANGE)
+  const totalAmount = getTotal() || 0;
 
   useEffect(() => {
     let start = animatedTotal;
     const diff = totalAmount - start;
     const duration = 300;
     const startTime = performance.now();
-
+ 
     const animate = (currentTime) => {
       const progress = Math.min(
         (currentTime - startTime) / duration,
@@ -55,16 +76,33 @@ const TravellersStep = () => {
       setAnimatedTotal(start + diff * progress);
       if (progress < 1) requestAnimationFrame(animate);
     };
-
+ 
     requestAnimationFrame(animate);
   }, [totalAmount]);
-
-  const handleContinue = () => {
+ 
+  // ❗ CONDITIONS AFTER ALL HOOKS
+  if (loading) return <div className="p-10">Loading...</div>;
+  if (!pkg) return <div className="p-10">Booking not found</div>;
+ 
+  const isAbroad = pkg.category === "INTERNATIONAL";
+ 
+  const adults = travellers.filter((t) => t.type === "Adult");
+  const children = travellers.filter((t) => t.type === "Child");
+ 
+  const adultTotal = adults.length * pkg.price;
+  const childTotal = children.length * (pkg.price * 0.75);
+ 
+  const addonsTotal = addons.reduce(
+    (sum, addon) => sum + addon.price,
+    0
+  );
+ 
+  const handleContinue = async () => {
     if (travellers.length === 0) {
       alert("Please add at least one traveller.");
       return;
     }
-
+ 
     const invalid = travellers.some(
       (t) =>
         !t.name ||
@@ -73,18 +111,40 @@ const TravellersStep = () => {
         !t.gender ||
         (isAbroad && !t.passport)
     );
-
+ 
     if (invalid) {
       alert("Please fill all traveller details.");
       return;
     }
+ 
+    try {
+      const response = await fetch(
+        `${BASE_URL}/bookings/${id}/travellers`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            travellers,
+            totalAmount,
+          }),
+        }
+      );
 
-    navigate(`/checkout/${id}/review`);
+      if (!response.ok) {
+        throw new Error("Failed to update booking");
+      }
+ 
+      navigate(`/checkout/${id}/review`);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong while saving booking");
+    }
   };
-
+ 
   return (
     <div className="relative">
-
       {/* STEP PROGRESS */}
       <div className="flex items-center justify-between mb-8">
         {["Travellers", "Review", "Payment"].map((step, index) => (
@@ -102,16 +162,14 @@ const TravellersStep = () => {
           </div>
         ))}
       </div>
-
+ 
       <div className="flex flex-col lg:flex-row gap-8">
-
         {/* LEFT SIDE */}
         <div className="flex-1">
-
           <h2 className="text-2xl font-semibold mb-6">
             Traveller Details
           </h2>
-
+ 
           {travellers.map((traveller, index) => (
             <div
               key={index}
@@ -121,7 +179,7 @@ const TravellersStep = () => {
                 <p className="font-medium">
                   {traveller.type} {index + 1}
                 </p>
-
+ 
                 <button
                   onClick={() => removeTraveller(index)}
                   className="text-red-500 text-sm"
@@ -129,7 +187,7 @@ const TravellersStep = () => {
                   Remove
                 </button>
               </div>
-
+ 
               <div className="grid md:grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -140,7 +198,7 @@ const TravellersStep = () => {
                   }
                   className="border p-3 rounded"
                 />
-
+ 
                 <input
                   type="number"
                   placeholder="Age"
@@ -150,7 +208,7 @@ const TravellersStep = () => {
                   }
                   className="border p-3 rounded"
                 />
-
+ 
                 <input
                   type="email"
                   placeholder="Email"
@@ -160,17 +218,29 @@ const TravellersStep = () => {
                   }
                   className="border p-3 rounded"
                 />
-
+ 
                 <input
-                  type="gender"
-                  placeholder="Gender"
+                  type="text"
+                  placeholder="Mobile"
+                  value={traveller.mobile || ""}
+                  onChange={(e) =>
+                    updateTraveller(index, { mobile: e.target.value })
+                  }
+                  className="border p-3 rounded"
+                />
+ 
+                <select
                   value={traveller.gender || ""}
                   onChange={(e) =>
                     updateTraveller(index, { gender: e.target.value })
                   }
                   className="border p-3 rounded"
-                />
-
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+ 
                 {isAbroad && (
                   <input
                     type="text"
@@ -187,7 +257,7 @@ const TravellersStep = () => {
               </div>
             </div>
           ))}
-
+ 
           {/* ADD BUTTONS */}
           <div className="flex gap-4 mt-4">
             <button
@@ -197,14 +267,15 @@ const TravellersStep = () => {
                   name: "",
                   age: "",
                   email: "",
-                  gender:" ",
+                  mobile: "",
+                  gender: "",
                 })
               }
               className="px-4 py-2 bg-blue-600 text-white rounded-full"
             >
               + Add Adult
             </button>
-
+ 
             <button
               onClick={() =>
                 addTraveller({
@@ -212,7 +283,8 @@ const TravellersStep = () => {
                   name: "",
                   age: "",
                   email: "",
-                  gender:" ",
+                  mobile: "",
+                  gender: "",
                 })
               }
               className="px-4 py-2 bg-green-600 text-white rounded-full"
@@ -220,123 +292,34 @@ const TravellersStep = () => {
               + Add Child (25% Off)
             </button>
           </div>
-
-          {/* MOBILE SUMMARY — FORCED DIRECT POSITION */}
-          <div className="lg:hidden border rounded-xl p-6 shadow-sm bg-white mt-6">
-
-            <h3 className="text-lg font-semibold mb-4">
-              Price Summary
-            </h3>
-
-            <div className="flex justify-between mb-2">
-              <span>Adults ({adults.length})</span>
-              <span>₹{adultTotal.toLocaleString()}</span>
-            </div>
-
-            <div className="flex justify-between mb-2">
-              <span>Children ({children.length})</span>
-              <span>₹{childTotal.toLocaleString()}</span>
-            </div>
-
-            {addons.length > 0 && (
-              <>
-                <hr className="my-4" />
-                <p className="text-sm font-medium mb-2">
-                  Selected Activities
-                </p>
-
-                {addons.map((addon) => (
-                  <div
-                    key={addon.id}
-                    className="flex justify-between text-sm mb-1"
-                  >
-                    <span>
-                      Day {addon.day + 1} - {addon.name}
-                    </span>
-                    <span>
-                      ₹{addon.price.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-
-                <div className="flex justify-between font-medium mt-2">
-                  <span>Add-ons Total</span>
-                  <span>
-                    ₹{addonsTotal.toLocaleString()}
-                  </span>
-                </div>
-              </>
-            )}
-
-            <hr className="my-4" />
-
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total</span>
-              <span>
-                ₹{Math.round(animatedTotal).toLocaleString()}
-              </span>
-            </div>
-          </div>
-
-          {/* CONTINUE BUTTON — NOW GUARANTEED BELOW SUMMARY */}
+ 
           <button
             onClick={handleContinue}
             className="mt-6 w-full px-6 py-3 bg-black text-white rounded-full"
           >
             Continue to Review
           </button>
-
         </div>
-
-        {/* DESKTOP SIDEBAR */}
+ 
+        {/* DESKTOP SUMMARY */}
         <div className="hidden lg:block w-96">
           <div className="sticky top-6 border rounded-xl p-6 shadow-sm bg-white">
             <h3 className="text-lg font-semibold mb-4">
               Price Summary
             </h3>
-
+ 
             <div className="flex justify-between mb-2">
               <span>Adults ({adults.length})</span>
               <span>₹{adultTotal.toLocaleString()}</span>
             </div>
-
+ 
             <div className="flex justify-between mb-2">
               <span>Children ({children.length})</span>
               <span>₹{childTotal.toLocaleString()}</span>
             </div>
-
-            {addons.length > 0 && (
-              <>
-                <hr className="my-4" />
-                <p className="text-sm font-medium mb-2">
-                  Selected Activities
-                </p>
-
-                {addons.map((addon) => (
-                  <div
-                    key={addon.id}
-                    className="flex justify-between text-sm mb-1"
-                  >
-                    <span>
-                      Day {addon.day + 1} - {addon.name}
-                    </span>
-                    <span>
-                      ₹{addon.price.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-
-                <div className="flex justify-between font-medium mt-2">
-                  <span>Add-ons Total</span>
-                  <span>
-                    ₹{addonsTotal.toLocaleString()}
-                  </span>
-                </div>
-              </>
-            )}
-
+ 
             <hr className="my-4" />
-
+ 
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
               <span>
@@ -345,10 +328,9 @@ const TravellersStep = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
 };
-
+ 
 export default TravellersStep;

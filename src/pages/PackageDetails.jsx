@@ -4,63 +4,62 @@ import { useCheckoutStore } from "../store/checkout.store";
 import ImageWithPlaceholder from "../components/ImageWithPlaceholder";
 
 const PackageDetails = () => {
-  const { id } = useParams();
+  const { id} = useParams();
   const navigate = useNavigate();
 
   /* ================= PACKAGE RESOLUTION ================= */
 
-  const [pkg, setPkg] = useState(null);
-  const [loading, setLoading] = useState(true);
+const [pkg, setPkg] = useState(null);
+const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) return;
+useEffect(() => {
+  if (!id) return;
 
-    const fetchPackage = async () => {
-      try {
-        const response = await fetch(
-          `http://192.168.1.27:8082/api/packages/${id}`,
-        );
+  const fetchPackage = async () => {
+    try {
+      const response = await fetch(
+        // `http://192.168.1.27:8082/api/packages/${id}`
+        `http://localhost:8082/api/packages/${id}`
+      );
 
-        if (!response.ok) throw new Error("Failed to fetch");
+      if (!response.ok) throw new Error("Failed to fetch");
 
-        const data = await response.json();
+      const data = await response.json();
 
-        setPkg({
-          ...data,
-          location: data.location,
-          images:
-            data.images && data.images.length > 0
-              ? data.images
-              : data.image
-                ? [data.image]
-                : [],
-        });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setPkg({
+      ...data,
+      location: data.location,
+      images: data.images && data.images.length > 0
+        ? data.images
+        : data.image
+          ? [data.image]
+          : [],
+    });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchPackage();
-  }, [id]);
+  fetchPackage();
+}, [id]);
 
   /* ================= NORMALIZATION LAYER ================= */
-  const normalizedPkg = useMemo(() => {
-    if (!pkg) return null;
+const normalizedPkg = useMemo(() => {
+  if (!pkg) return null;
 
-    return {
-      ...pkg,
-      nights: pkg.nights || 3,
-      location: pkg.location || pkg.toCity,
-      images:
-        pkg.images && pkg.images.length > 0
-          ? pkg.images
-          : pkg.image
-            ? [pkg.image]
-            : [],
-    };
-  }, [pkg]);
+  return {
+    ...pkg,
+    nights: pkg.nights || 3,
+    location: pkg.location || pkg.toCity,
+    images: pkg.images && pkg.images.length > 0
+  ? pkg.images
+  : pkg.image
+    ? [pkg.image]
+    : [],
+  };
+}, [pkg]);
 
   /* ================= STATE ================= */
 
@@ -78,14 +77,14 @@ const PackageDetails = () => {
   }, [pkg, clearAddons, setPackage]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading package...
-      </div>
-    );
-  }
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      Loading package...
+    </div>
+  );
+}
 
-  /* ================= SAFE FALLBACK ================= */
+    /* ================= SAFE FALLBACK ================= */
 
   if (!pkg) {
     return (
@@ -153,6 +152,36 @@ const PackageDetails = () => {
 
   const totalPrice = normalizedPkg.price + activitiesTotal;
 
+  const handleProceedToBooking = async () => {
+  try {
+    const res = await fetch("http://localhost:8082/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        packageId: normalizedPkg.id,
+        totalAmount: normalizedPkg.price,
+        travellers: []
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Booking creation failed");
+    }
+
+    const booking = await res.json();
+
+    console.log("BOOKING CREATED:", booking);
+
+    // ✅ Use booking.id NOT package.id
+    navigate(`/checkout/${booking.id}/travellers`);
+
+  } catch (err) {
+    console.error("Booking error:", err);
+  }
+};
+
   /* ================= UI ================= */
 
   return (
@@ -170,18 +199,21 @@ const PackageDetails = () => {
       {/* GALLERY */}
       <div className="max-w-7xl mx-auto px-6 mt-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {normalizedPkg.images.map((img, index) => (
-            <ImageWithPlaceholder
-              key={index}
-              src={
-                img.startsWith("http") ? img : `http://192.168.1.27:8082${img}`
-              }
-              alt="package image"
-              className={`w-full object-cover rounded-xl ${
-                index === 0 ? "col-span-2 row-span-2 h-64 md:h-80" : "h-40"
-              }`}
-            />
-          ))}
+        {normalizedPkg.images.map((img, index) => (
+              <ImageWithPlaceholder
+                key={index}
+                src={img.startsWith("http")
+                ? img
+                // : `http://192.168.1.27:8082${img}`}
+                : `http://localhost:8082${img}`}
+                alt="package image"
+                className={`w-full object-cover rounded-xl ${
+                  index === 0
+                    ? "col-span-2 row-span-2 h-64 md:h-80"
+                    : "h-40"
+                }`}
+              />
+            ))}
         </div>
 
         {/* TABS */}
@@ -338,13 +370,12 @@ const PackageDetails = () => {
               </div>
             </div>
           )}
-
-          <button
-            onClick={() => navigate(`/checkout/${normalizedPkg.id}/travellers`)}
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
-          >
-            Proceed to Booking
-          </button>
+            <button
+              onClick={handleProceedToBooking}
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl transition"
+            >
+              Proceed to Booking
+            </button>
 
           <p className="mt-6 text-xs text-red-500">
             <b>*Prices may vary depending on availability.</b>

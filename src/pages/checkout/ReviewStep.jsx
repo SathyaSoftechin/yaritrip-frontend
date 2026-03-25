@@ -1,7 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCheckoutStore } from "../../store/checkout.store";
-import { packagesData } from "../Results/mockData";
-import { useEffect } from "react";
 
 const ReviewStep = () => {
   const navigate = useNavigate();
@@ -15,21 +14,39 @@ const ReviewStep = () => {
     setPackage,
   } = useCheckoutStore();
 
-  /* ---------- Ensure Package Exists ---------- */
-  useEffect(() => {
-    if (!packageData) {
-      const pkg = packagesData.find((p) => p.id === Number(id));
-      if (pkg) setPackage(pkg);
-    }
-  }, [id, packageData, setPackage]);
+  const [pkg, setPkg] = useState(null);
+  const [booking, setBooking] = useState(null);
 
-  const pkg =
-    packageData || packagesData.find((p) => p.id === Number(id));
+  /* ---------- FETCH FROM BACKEND (FIXED) ---------- */
+  useEffect(() => {
+    const fetchBooking = async () => {
+      try {
+        const res = await fetch(`http://localhost:8082/api/bookings/${id}`);
+
+        if (!res.ok) throw new Error("Booking not found");
+
+        const data = await res.json();
+
+        setBooking(data.booking);
+
+        if (data.package) {
+          setPackage(data.package);
+          setPkg(data.package);   // ✅ IMPORTANT FIX
+        }
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+      }
+    };
+
+    fetchBooking();   // ✅ ALWAYS FETCH
+  }, [id, setPackage]);
+
+  const finalPkg = pkg || packageData;   // ✅ SAFE FALLBACK
 
   /* ---------- Guards ---------- */
   useEffect(() => {
-    if (!pkg) navigate("/results");
-  }, [pkg, navigate]);
+    if (!finalPkg) return;
+  }, [finalPkg]);
 
   useEffect(() => {
     if (travellers.length === 0) {
@@ -37,13 +54,13 @@ const ReviewStep = () => {
     }
   }, [travellers, id, navigate]);
 
-  if (!pkg) return null;
+  if (!finalPkg) return null;
 
   const adults = travellers.filter((t) => t.type === "Adult");
   const children = travellers.filter((t) => t.type === "Child");
 
-  const adultTotal = adults.length * pkg.price;
-  const childTotal = children.length * (pkg.price * 0.75);
+  const adultTotal = adults.length * finalPkg.price;
+  const childTotal = children.length * (finalPkg.price * 0.75);
 
   const addonsTotal = addons.reduce(
     (sum, addon) => sum + addon.price,
@@ -54,10 +71,10 @@ const ReviewStep = () => {
 
   /* ---------- Dynamic Itinerary ---------- */
   const itineraryDays = Array.from(
-    { length: pkg.nights },
+    { length: finalPkg.nights },
     (_, index) => ({
       title: `Day ${index + 1}`,
-      description: `Enjoy exploring ${pkg.location} with guided experiences and leisure activities.`,
+      description: `Enjoy exploring ${finalPkg.location} with guided experiences and leisure activities.`,
     })
   );
 
@@ -84,24 +101,24 @@ const ReviewStep = () => {
         <div className="flex-1">
           <div className="mb-6">
             <img
-              src={pkg.image}
-              alt={pkg.title}
+              src={finalPkg.image}
+              alt={finalPkg.title}
               className="w-full h-64 object-cover rounded-xl"
             />
           </div>
 
           <div className="border rounded-xl p-6 mb-6 bg-white shadow-sm">
             <h2 className="text-2xl font-semibold mb-2">
-              {pkg.title}
+              {finalPkg.title}
             </h2>
             <p className="text-gray-600 mb-2">
-              {pkg.location} ({pkg.code})
+              {finalPkg.location} ({finalPkg.code})
             </p>
             <p className="text-sm text-gray-500 mb-2">
-              {pkg.nights} Nights Stay
+              {finalPkg.nights} Nights Stay
             </p>
             <p className="text-yellow-500 text-sm">
-              ⭐ {pkg.rating} Rating
+              ⭐ {finalPkg.rating} Rating
             </p>
           </div>
 
@@ -161,8 +178,6 @@ const ReviewStep = () => {
         </div>
 
         {/* ================= RIGHT SIDEBAR ================= */}
-
-        {/* Desktop */}
         <div className="hidden lg:block lg:w-96">
           <div className="bg-white rounded-2xl shadow-lg border p-6">
             <h3 className="text-xl font-semibold mb-6">
