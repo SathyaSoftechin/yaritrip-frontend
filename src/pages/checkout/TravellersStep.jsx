@@ -2,8 +2,10 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useCheckoutStore } from "../../store/checkout.store";
 import { useEffect, useState } from "react";
 
-const BASE_URL = "http://localhost:8082/api";
- 
+// const BASE_URL = "http://localhost:8082/api";
+const BASE_URL = "http://192.168.1.17:8082/api";
+
+
 const TravellersStep = () => {
   const { id } = useParams(); // bookingId
   const navigate = useNavigate();

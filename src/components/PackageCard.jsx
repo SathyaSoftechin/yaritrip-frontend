@@ -19,11 +19,11 @@ const PackageCard = ({ pkg }) => {
                  cursor-pointer"
     >
       <div className="relative group overflow-hidden">
-<img
-  src={pkg.image}
-  alt={pkg.title}
-  className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105"
-/>
+        <img
+          src={pkg.image}
+          alt={pkg.title}
+          className="w-full h-44 object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -53,9 +53,7 @@ const PackageCard = ({ pkg }) => {
         <div className="border-t my-3"></div>
 
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">
-            Package Starting from
-          </span>
+          <span className="text-xs text-gray-500">Package Starting from</span>
 
           <span className="font-semibold text-lg text-gray-900">
             ₹{pkg.price.toLocaleString()}

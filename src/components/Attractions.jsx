@@ -30,21 +30,21 @@ const fallbackData = {
         id: "dubai-global-village",
         title: "Dubai : Global Village Entry",
         image: dubaiGlobal,
-        rating: "8.5",
+        rating: "5",
         reviews: 2010,
       },
       {
         id: "dubai-burj-lake-ride",
         title: "Dubai : Burj Khalifa Lake Ride",
         image: dubaiBurj,
-        rating: "8.5",
+        rating: "5",
         reviews: 2010,
       },
       {
         id: "dubai-mega-yacht",
         title: "Dubai : Mega Yacht Dinner Cruise",
         image: dubaiYacht,
-        rating: "8.5",
+        rating: "5",
         reviews: 2010,
       },
     ],
@@ -55,21 +55,21 @@ const fallbackData = {
         id: "india-taj-mahal-tour",
         title: "Taj Mahal Guided Tour",
         image: indiaTaj,
-        rating: "9.1",
+        rating: "5",
         reviews: 5410,
       },
       {
         id: "india-jaipur-heritage",
         title: "Jaipur Heritage Walk",
         image: indiaJaipur,
-        rating: "8.7",
+        rating: "5",
         reviews: 2230,
       },
       {
         id: "india-kerala-backwater",
         title: "Kerala Backwater Cruise",
         image: indiaKerala,
-        rating: "8.9",
+        rating: "5",
         reviews: 3010,
       },
     ],
@@ -80,14 +80,14 @@ const fallbackData = {
         id: "singapore-skypark",
         title: "SkyPark Observation Deck",
         image: singaporeSky,
-        rating: "8.8",
+        rating: "5",
         reviews: 1980,
       },
       {
         id: "singapore-gardens-bay",
         title: "Gardens by the Bay",
         image: singaporeGarden,
-        rating: "9.0",
+        rating: "5",
         reviews: 4120,
       },
     ],
@@ -98,7 +98,7 @@ const fallbackData = {
         id: "bangkok-grand-palace",
         title: "Grand Palace & Temple Tour",
         image: bangkokTemple,
-        rating: "8.6",
+        rating: "5",
         reviews: 2640,
       },
     ],
@@ -113,7 +113,13 @@ const exploreImages = {
 };
 
 const countries = ["Dubai", "India", "Singapore", "Bangkok"];
-const API_BASE = "http://192.168.1.27:8082";
+const API_BASE = "http://192.168.1.17:8082";
+const cityToCode = {
+  Dubai: "DXB",
+  India: "DEL",
+  Singapore: "SIN",
+  Bangkok: "BKK",
+};
 
 const Attractions = () => {
   const navigate = useNavigate();
@@ -127,7 +133,7 @@ const Attractions = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `${API_BASE}/api/attractions/popular?city=${activeCountry}`
+          `${API_BASE}/api/attractions/popular?city=${activeCountry}`,
         );
 
         if (!res.ok) throw new Error();
@@ -142,7 +148,7 @@ const Attractions = () => {
               image: item.imageUrl,
               rating: item.rating.toFixed(1),
               reviews: item.reviews,
-            }))
+            })),
           );
         } else {
           setItems(fallbackData[activeCountry]?.items ?? []);
@@ -207,7 +213,8 @@ const Attractions = () => {
               : items.map((item) => (
                   <div
                     key={item.id}
-                    onClick={() => navigate(`/attractions/${item.id}`)}
+                    // onClick={() => navigate(`/attractions/${item.id}`)}
+                    // onClick={() => navigate(`/attractions/${item.id}`)}
                     className="min-w-[230px] md:min-w-0 md:w-[260px] bg-white rounded-2xl p-3 shadow-lg cursor-pointer hover:shadow-xl transition"
                   >
                     <div className="rounded-xl overflow-hidden">
@@ -246,11 +253,18 @@ const Attractions = () => {
               <div className="absolute inset-0 bg-black/50" />
 
               <div className="relative z-10 p-4 h-full flex flex-col justify-end text-white">
-                <p className="text-sm mb-3">Explore more packages</p>
+                <p className="text-sm mb-3">
+                  Explore more packages of <br />
+                  <span className="font-bold text-lg capitalize">
+                    {activeCountry || "this destination"}
+                  </span>
+                </p>
                 <button
-                  onClick={() =>
-                    navigate(`/packages/${activeCountry.toLowerCase()}`)
-                  }
+                  onClick={() => {
+                    const destinationCode = cityToCode[activeCountry];
+
+                    navigate(`/results?to=${destinationCode}`);
+                  }}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg w-fit"
                 >
                   Go Now

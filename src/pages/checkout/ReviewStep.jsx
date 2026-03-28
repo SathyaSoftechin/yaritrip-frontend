@@ -21,7 +21,8 @@ const ReviewStep = () => {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
-        const res = await fetch(`http://localhost:8082/api/bookings/${id}`);
+        // const res = await fetch(`http://localhost:8082/api/bookings/${id}`);
+        const res = await fetch(`http://192.168.1.17:8082/api/bookings/${id}`);
 
         if (!res.ok) throw new Error("Booking not found");
 

@@ -1,17 +1,18 @@
 import { useState } from "react";
+import { Icon } from "@iconify/react";
 
 const options = [
-  { label: "Holiday Packages", icon: "🧳", active: true },
-  { label: "Flights", icon: "✈️" },
-  { label: "Hotels", icon: "🏨" },
-  { label: "Homestays", icon: "🏡" },
-  { label: "Trains", icon: "🚆" },
-  { label: "Cabs", icon: "🚕" },
-  { label: "Buses", icon: "🚌" },
-  { label: "Tours & Attractions", icon: "🎡" },
-  { label: "Cruise", icon: "🚢" },
-  { label: "Forex card & Currency", icon: "💱" },
-  { label: "Travel Insurance", icon: "🛡️" },
+  { label: "Holiday Packages", icon: "mdi:bag-suitcase", active: true },
+  { label: "Flights", icon: "mdi:airplane" },
+  { label: "Hotels", icon: "mdi:hotel" },
+  { label: "Homestays", icon: "mdi:home-city" },
+  { label: "Trains", icon: "mdi:train" },
+  { label: "Cabs", icon: "mdi:taxi" },
+  { label: "Buses", icon: "mdi:bus" },
+  { label: "Tours & Attractions", icon: "mdi:ferris-wheel" },
+  { label: "Cruise", icon: "mdi:ferry" },
+  { label: "Forex card & Currency", icon: "mdi:currency-usd" },
+  { label: "Travel Insurance", icon: "mdi:shield-check" },
 ];
 
 const VISIBLE_COUNT = 6;
@@ -21,8 +22,19 @@ const GAP = 16;
 const Options = () => {
   const [start, setStart] = useState(0);
 
+  /* ✅ Track clicked item */
+  const [clicked, setClicked] = useState(null);
+
   const canSlideLeft = start > 0;
   const canSlideRight = start + VISIBLE_COUNT < options.length;
+
+  const handleClick = (item) => {
+    if (item.active) return;
+    setClicked(item.label);
+
+    /* auto hide after 2s */
+    setTimeout(() => setClicked(null), 2000);
+  };
 
   return (
     <section className="w-full bg-white py-10">
@@ -33,27 +45,9 @@ const Options = () => {
           {canSlideLeft && (
             <button
               onClick={() => setStart((s) => Math.max(0, s - 1))}
-              className="
-                absolute left-3 top-1/2 -translate-y-1/2 z-20
-                w-11 h-11 rounded-full
-                bg-white/70 backdrop-blur-md
-                border border-white/40
-                shadow-lg
-                flex items-center justify-center
-                transition-all duration-300
-                hover:scale-110 hover:shadow-blue-300/50
-                active:scale-95
-              "
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/70 backdrop-blur-md border shadow-lg flex items-center justify-center hover:scale-110 transition"
             >
-              <svg
-                className="w-5 h-5 text-gray-800"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <Icon icon="mdi:chevron-left" className="text-2xl text-gray-800" />
             </button>
           )}
 
@@ -61,27 +55,9 @@ const Options = () => {
           {canSlideRight && (
             <button
               onClick={() => setStart((s) => s + 1)}
-              className="
-                absolute right-3 top-1/2 -translate-y-1/2 z-20
-                w-11 h-11 rounded-full
-                bg-white/70 backdrop-blur-md
-                border border-white/40
-                shadow-lg
-                flex items-center justify-center
-                transition-all duration-300
-                hover:scale-110 hover:shadow-blue-300/50
-                active:scale-95
-              "
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/70 backdrop-blur-md border shadow-lg flex items-center justify-center hover:scale-110 transition"
             >
-              <svg
-                className="w-5 h-5 text-gray-800"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <Icon icon="mdi:chevron-right" className="text-2xl text-gray-800" />
             </button>
           )}
 
@@ -95,48 +71,46 @@ const Options = () => {
             >
               {options.map((item) => {
                 const isActive = item.active;
+                const showComingSoon = clicked === item.label;
 
                 return (
                   <div
                     key={item.label}
+                    onClick={() => handleClick(item)}
                     className={`
-                      flex-shrink-0 w-[150px] h-[140px]
+                      flex-shrink-0 w-[130px] h-[110px]
+                      cursor-pointer
                       transition-all duration-300
+                      flex flex-col items-center justify-center gap-2 px-3 py-3
                       ${isActive 
-                        ? "border-blue-500 bg-blue-50 "
-                        : "border-gray-200 bg-white"}
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 bg-white hover:shadow-md"}
                     `}
                   >
-                    <div className="h-full flex flex-col items-center gap-2 px-3 py-4">
+                    {/* ICON */}
+                    <Icon
+                      icon={item.icon}
+                      className={`text-3xl ${
+                        isActive ? "text-blue-600" : "text-gray-700"
+                      }`}
+                    />
 
-                      {/* ICON */}
-                      <span className="text-3xl">{item.icon}</span>
+                    {/* LABEL */}
+                    <span
+                      className={`text-sm font-medium text-center leading-tight
+                        ${isActive ? "text-blue-600" : "text-gray-800"}
+                      `}
+                    >
+                      {item.label}
+                    </span>
 
-                      {/* LABEL */}
-                      <span
-                        className={`text-sm font-medium text-center leading-tight
-                          ${isActive ? "text-blue-600" : "text-gray-800"}
-                        `}
-                      >
-                        {item.label}
-                      </span>
-
-                      {/* BADGE (CLOSE TO LABEL) */}
-                      <div className="h-[26px] flex items-center justify-center">
-                        {isActive ? (
-                          <span className="opacity-0 text-xs px-3">
-                            Coming Soon
-                          </span>
-                        ) : (
-                          <div className="relative overflow-hidden rounded-full border border-gray-200 bg-gray-100 px-3 py-[2px]">
-                            <span className="relative z-10 text-xs font-semibold text-red-500 whitespace-nowrap">
-                              Coming Soon
-                            </span>
-                            <span className="absolute inset-0 animate-shine bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-                          </div>
-                        )}
-                      </div>
-
+                    {/* ✅ COMING SOON MESSAGE */}
+                    <div className="h-[18px] flex items-center justify-center">
+                      {showComingSoon && !isActive && (
+                        <span className="text-[11px] text-red-500 font-medium animate-fadeIn">
+                          Coming Soon
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -146,15 +120,15 @@ const Options = () => {
         </div>
       </div>
 
-      {/* Shine animation */}
+      {/* Animation */}
       <style>
         {`
-          @keyframes shine {
-            0% { transform: translateX(-120%); }
-            100% { transform: translateX(120%); }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
           }
-          .animate-shine {
-            animation: shine 2.2s linear infinite;
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease forwards;
           }
         `}
       </style>

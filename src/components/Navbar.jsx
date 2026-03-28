@@ -83,24 +83,38 @@ const Navbar = () => {
   /* ---------- SYNC SEARCH FROM URL (Hero ↔ Navbar) ---------- */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+
     const fromParam = params.get("from");
     const toParam = params.get("to");
 
+    /* ✅ If NO params → RESET (Home page case) */
+    if (!fromParam && !toParam) {
+      setFromCity(null);
+      setDestination(null);
+      setSearchFrom("");
+      setSearchTo("");
+      return;
+    }
+
+    /* ✅ Otherwise hydrate normally */
     if (fromParam) {
       const match = airportCities.find(
-        (item) => item.code.toLowerCase() === fromParam.toLowerCase()
+        (item) => item.code.toLowerCase() === fromParam.toLowerCase(),
       );
-      if (match) setFromCity(match);
+      setFromCity(match || null);
+    } else {
+      setFromCity(null);
     }
 
     if (toParam) {
       const match = airportCities.find(
-        (item) => item.code.toLowerCase() === toParam.toLowerCase()
+        (item) => item.code.toLowerCase() === toParam.toLowerCase(),
       );
-      if (match) setDestination(match);
+      setDestination(match || null);
+    } else {
+      setDestination(null);
     }
   }, [location.search]);
-
   /* ---------- OUTSIDE CLICK CLOSE ---------- */
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -109,52 +123,54 @@ const Navbar = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   /* ---------- FILTER LOGIC ---------- */
   const filteredFrom = airportCities.filter(
     (item) =>
       item.city.toLowerCase().includes(searchFrom.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchFrom.toLowerCase())
+      item.code.toLowerCase().includes(searchFrom.toLowerCase()),
   );
 
   const filteredTo = airportCities.filter(
     (item) =>
       item.city.toLowerCase().includes(searchTo.toLowerCase()) ||
-      item.code.toLowerCase().includes(searchTo.toLowerCase())
+      item.code.toLowerCase().includes(searchTo.toLowerCase()),
   );
 
   /* ---------- SMART MATCH ---------- */
   const smartMatch = (value, list) => {
     if (!value) return null;
-    return (
-      list[0] ||
-      airportCities.find(
-        (item) =>
-          item.city.toLowerCase() === value.toLowerCase() ||
-          item.code.toLowerCase() === value.toLowerCase()
-      )
+
+    return airportCities.find(
+      (item) =>
+        item.city.toLowerCase() === value.toLowerCase() ||
+        item.code.toLowerCase() === value.toLowerCase(),
     );
   };
 
   /* ---------- SEARCH SUBMIT ---------- */
   const handleSearch = () => {
-    let finalFrom = fromCity || smartMatch(searchFrom, filteredFrom);
-    let finalTo = destination || smartMatch(searchTo, filteredTo);
-
-    if (!finalFrom || !finalTo) {
-      alert("Please select valid From and Destination.");
+    /* Destination is mandatory */
+    if (!destination) {
+      alert("Please select a destination.");
       return;
     }
 
-    if (finalFrom.code === finalTo.code) {
-      alert("Departure and Destination cannot be the same airport.");
-      return;
+    /* If user selected FROM */
+    if (fromCity) {
+      if (fromCity.code === destination.code) {
+        alert("Departure and Destination cannot be the same airport.");
+        return;
+      }
+
+      navigate(`/results?from=${fromCity.code}&to=${destination.code}`);
+    } else {
+      /* Destination-only flow */
+      navigate(`/results?to=${destination.code}`);
     }
 
-    navigate(`/results?from=${finalFrom.code}&to=${finalTo.code}`);
     setMobileMenuOpen(false);
     setOpenDropdown(null);
   };
@@ -201,18 +217,10 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder="From"
-                  value={
-                    fromCity
-                      ? `${fromCity.city} (${fromCity.code})`
-                      : searchFrom
-                  }
+                  value={fromCity ? `${fromCity.city} (${fromCity.code})` : ""}
+                  readOnly
                   onFocus={() => setOpenDropdown("from")}
-                  onChange={(e) => {
-                    setSearchFrom(e.target.value);
-                    setFromCity(null);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  className="bg-transparent outline-none text-sm w-28"
+                  className="bg-transparent outline-none text-sm w-28 cursor-pointer"
                 />
 
                 {openDropdown === "from" && (
@@ -244,15 +252,11 @@ const Navbar = () => {
                   value={
                     destination
                       ? `${destination.city} (${destination.code})`
-                      : searchTo
+                      : ""
                   }
+                  readOnly
                   onFocus={() => setOpenDropdown("to")}
-                  onChange={(e) => {
-                    setSearchTo(e.target.value);
-                    setDestination(null);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  className="bg-transparent outline-none text-sm w-32"
+                  className="bg-transparent outline-none text-sm w-32 cursor-pointer"
                 />
 
                 {openDropdown === "to" && (
@@ -336,7 +340,6 @@ const Navbar = () => {
         {/* ================= MOBILE DROPDOWN ADDED ================= */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 bg-white rounded-2xl shadow-xl p-6 space-y-6 z-50">
-            
             {/* Search (Mobile) */}
             {showSearch && (
               <div className="space-y-3">

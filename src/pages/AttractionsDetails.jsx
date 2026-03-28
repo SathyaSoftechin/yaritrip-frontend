@@ -18,7 +18,7 @@ const AttractionsDetails = () => {
     const fetchPackage = async () => {
       try {
         const response = await fetch(
-          `http://192.168.1.27:8082/api/packages/${id}`,
+          `http://192.168.1.17:8082/api/packages/${id}`,
         );
 
         if (!response.ok) throw new Error("Failed to fetch");
@@ -174,7 +174,7 @@ const AttractionsDetails = () => {
             <ImageWithPlaceholder
               key={index}
               src={
-                img.startsWith("http") ? img : `http://192.168.1.27:8082${img}`
+                img.startsWith("http") ? img : `http://192.168.1.17:8082${img}`
               }
               alt="package image"
               className={`w-full object-cover rounded-xl ${

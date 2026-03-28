@@ -1,4 +1,4 @@
-const API_BASE = "http://192.168.1.27:8082";
+const API_BASE = "http://192.168.1.17:8082";
 
 export const fetchPackagesByCountry = async (country) => {
   const res = await fetch(
