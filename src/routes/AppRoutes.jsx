@@ -5,7 +5,7 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import UserProfile from "../pages/UserProfile";
 import ResultsPage from "../pages/Results";
-import AttractionsDetails from "../pages/AttractionsDetails";
+// import AttractionsDetails from "../pages/AttractionsDetails";
 
 /* OLD Results-Based Package Page */
 import PackageDetails from "../pages/PackageDetails";
@@ -45,7 +45,7 @@ const AppRoutes = () => {
         path="/packages/:country/:packageId"
         element={<PackageDetails />}
       />
-      <Route path="/attractions/:id" element={<AttractionsDetails />} />
+      {/* <Route path="/attractions/:id" element={<AttractionsDetails />} /> */}
 
       {/* ================= CHECKOUT FLOW ================= */}
       <Route path="/checkout/:id" element={<CheckoutLayout />}>
