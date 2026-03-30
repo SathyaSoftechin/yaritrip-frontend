@@ -31,7 +31,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     emailOrMobile: "",
-    password: ""
+    password: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ const Login = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
     setError(""); // Clear error on input change
   };
@@ -56,22 +56,39 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.emailOrMobile,
-          password: formData.password
-        })
+          emailOrMobile: formData.emailOrMobile,
+          password: formData.password,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Store token in localStorage
+        console.log("Login API Response:", data);
+
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        
-        // Navigate to home or dashboard
+
+        // ✅ Handle ALL backend cases safely
+        const userId = data.user?.id || data.id || data.userId;
+
+        if (!userId) {
+          console.error("User ID not found in response");
+          setError("Login failed: Invalid server response");
+          return;
+        }
+
+        localStorage.setItem("userId", userId);
+
+        // optional
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
         navigate("/");
       } else {
-        setError(data.message || "Login failed. Please check your credentials.");
+        setError(
+          data.message || "Login failed. Please check your credentials.",
+        );
       }
     } catch (err) {
       setError("An error occurred. Please try again later.");
@@ -82,7 +99,8 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://192.168.1.17:8082/oauth2/authorization/google";
+    window.location.href =
+      "http://192.168.1.17:8082/oauth2/authorization/google";
   };
 
   return (
@@ -97,7 +115,8 @@ const Login = () => {
         {/* LEFT TEXT SECTION */}
         <div className="hidden lg:block max-w-lg text-white ml-20">
           <h1 className="text-5xl font-semibold leading-snug font-serif">
-            Explore <br /> The World 🗺️<br /> With <br />
+            Explore <br /> The World 🗺️
+            <br /> With <br />
             <span className="text-blue-400">Yaritrip</span>
           </h1>
           <p className="mt-6 text-sm opacity-80">
@@ -157,9 +176,7 @@ const Login = () => {
 
             {/* Password */}
             <div>
-              <label className="text-md font-bold text-white">
-                Password
-              </label>
+              <label className="text-md font-bold text-white">Password</label>
               <div className="mt-1 flex items-center gap-2 border rounded-lg px-3 py-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +228,7 @@ const Login = () => {
 
           {/* Social Login */}
           <div className="flex justify-center gap-4">
-            <button 
+            <button
               onClick={handleGoogleLogin}
               className="w-14 h-10 flex items-center justify-center bg-blue-50 rounded-lg hover:bg-blue-100 transition"
             >

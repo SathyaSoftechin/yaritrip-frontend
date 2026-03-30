@@ -280,7 +280,6 @@
 
 // export default Attractions;
 
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -542,11 +541,11 @@ const Attractions = () => {
                   </span>
                 </p>
                 <button
-                  onClick={() =>
-                    navigate(
-                      `/results?from=HYD&to=${cityToCode[activeCountry]}&rooms=1&guests=2`,
-                    )
-                  }
+                  onClick={() => {
+                    const destinationCode = cityToCode[activeCountry];
+
+                    navigate(`/results?to=${destinationCode}`);
+                  }}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg w-fit"
                 >
                   Go Now

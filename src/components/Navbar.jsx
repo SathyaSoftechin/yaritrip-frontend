@@ -35,7 +35,6 @@ const Navbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
 
   /* Search States */
   const [fromCity, setFromCity] = useState(null);
@@ -70,15 +69,34 @@ const Navbar = () => {
   /* ---------- LOGIN CHECK ---------- */
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const storedImage = localStorage.getItem("profileImage");
 
     if (token) {
       setIsLoggedIn(true);
-      setProfileImage(storedImage || "https://i.pravatar.cc/150");
     } else {
       setIsLoggedIn(false);
     }
   }, [location]);
+
+  //Progile image
+  useEffect(() => {
+    const loadImage = () => {
+      const storedImage = localStorage.getItem("profileImage");
+
+      if (storedImage) {
+        setProfileImage(storedImage);
+      } else {
+        setProfileImage("/default-avatar.png");
+      }
+    };
+
+    loadImage();
+
+    window.addEventListener("profileUpdated", loadImage);
+
+    return () => {
+      window.removeEventListener("profileUpdated", loadImage);
+    };
+  }, []);
 
   /* ---------- SYNC SEARCH FROM URL (Hero ↔ Navbar) ---------- */
   useEffect(() => {
@@ -182,6 +200,18 @@ const Navbar = () => {
       handleSearch();
     }
   };
+
+  const [profileImage, setProfileImage] = useState("");
+
+  useEffect(() => {
+    const storedImage = localStorage.getItem("profileImage");
+
+    if (storedImage) {
+      setProfileImage(storedImage);
+    } else {
+      setProfileImage("/default-avatar.png"); // fallback
+    }
+  }, []);
 
   return (
     <header
@@ -318,7 +348,7 @@ const Navbar = () => {
                 className="cursor-pointer"
               >
                 <img
-                  src={profileImage}
+                  src={profileImage || "/default-avatar.png"}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
                 />
