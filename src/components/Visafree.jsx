@@ -1,5 +1,5 @@
 import { useState } from "react";
-import visaBg from "../assets/visa/visafree-bg.jpeg";
+import visaBg from "../assets/Visa/visafree-bg.jpeg";
 
 /* ---------------- COUNTRY CODE MAP ---------------- */
 
