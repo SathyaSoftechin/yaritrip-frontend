@@ -21,6 +21,12 @@ import ReviewStep from "../pages/checkout/ReviewStep";
 import PaymentStep from "../pages/checkout/PaymentStep";
 import SuccessStep from "../pages/checkout/SuccessStep";
 
+// Footer Section pages
+
+import Privacy from "../pages/PrivacyPolicy";
+import Refund from "../pages/RefundPolicy";
+import Terms from "../pages/T&C"; 
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -64,6 +70,10 @@ const AppRoutes = () => {
           </div>
         }
       />
+
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/refund" element={<Refund />} />
 
     </Routes>
   );

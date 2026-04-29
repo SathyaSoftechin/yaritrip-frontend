@@ -225,6 +225,9 @@ const Footer = () => {
               <span className="hover:text-white cursor-pointer">
                 Privacy Policy
               </span>
+              <span className="hover:text-white cursor-pointer">
+                Refund Policy
+              </span>
             </div>
           </div>
         </div>
