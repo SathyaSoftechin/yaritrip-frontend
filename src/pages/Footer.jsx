@@ -7,6 +7,7 @@ import {
   FaEnvelope,
   FaPhoneAlt,
 } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
 
 import footerBg from "../assets/footer-bg.jpeg";
 import suitcaseImg from "../assets/footer-img.png";
@@ -219,15 +220,26 @@ const Footer = () => {
             <span>© 2026 yaritrip. All rights reserved.</span>
 
             <div className="flex gap-4">
-              <span className="hover:text-white cursor-pointer">
+              <NavLink
+                to="/terms"
+                className="hover:text-white cursor-pointer"
+              >
                 Terms & Conditions
-              </span>
-              <span className="hover:text-white cursor-pointer">
+              </NavLink>
+
+              <NavLink
+                to="/privacy"
+                className="hover:text-white cursor-pointer"
+              >
                 Privacy Policy
-              </span>
-              <span className="hover:text-white cursor-pointer">
+              </NavLink>
+
+              <NavLink
+                to="/refund"
+                className="hover:text-white cursor-pointer"
+              >
                 Refund Policy
-              </span>
+              </NavLink>
             </div>
           </div>
         </div>
