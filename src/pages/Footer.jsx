@@ -4,8 +4,6 @@ import {
   FaInstagram,
   FaLinkedinIn,
   FaYoutube,
-  FaEnvelope,
-  FaPhoneAlt,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
@@ -15,42 +13,44 @@ import suitcaseImg from "../assets/footer-img.png";
 const Footer = () => {
   return (
     <footer className="w-full">
-      {/* Outer wrapper */}
-      <div className="relative max-w-7xl overflow-hidden">
-        {/* Background Image */}
+      <div className="relative w-full overflow-hidden">
+
+        {/* Background */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${footerBg})` }}
         />
-
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-black/70" />
 
         {/* Content */}
-        <div className="relative z-10 px-8 py-10 text-white">
-          {/* TOP SECTION */}
-          <div className="grid grid-cols-1 lg:grid-cols-7 gap-10 items-start">
-            {/* Brand */}
-            <div className="lg:col-span-2">
-              <img
-                src="/logo2.png"
-                alt="yaritrip"
-                className="h-36 object-contain"
-              />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 py-12 text-white">
 
-              <div className="flex gap-4 text-lg mb-8 ml-7">
-                <FaFacebookF className="cursor-pointer hover:text-blue-400" />
-                <FaTwitter className="cursor-pointer hover:text-sky-400" />
-                <FaInstagram className="cursor-pointer hover:text-red-700" />
-                <FaLinkedinIn className="cursor-pointer hover:text-blue-500" />
-                <FaYoutube className="cursor-pointer hover:text-red-500" />
+          {/* TOP SECTION */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-10 items-start">
+
+            {/* LOGO + SOCIAL */}
+            <div className="lg:col-span-2">
+              <div className="h-32 flex items-center">
+                <img
+                  src="/logo2.png"
+                  alt="yaritrip"
+                  className="h-full object-contain scale-110"
+                />
+              </div>
+
+              <div className="flex gap-5 text-lg">
+                <FaFacebookF className="hover:text-blue-400 cursor-pointer" />
+                <FaTwitter className="hover:text-sky-400 cursor-pointer" />
+                <FaInstagram className="hover:text-pink-500 cursor-pointer" />
+                <FaLinkedinIn className="hover:text-blue-500 cursor-pointer" />
+                <FaYoutube className="hover:text-red-500 cursor-pointer" />
               </div>
             </div>
 
             {/* PRODUCT */}
             <div>
               <h4 className="text-lime-400 font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-gray-200">
+              <ul className="space-y-3 text-sm text-gray-300">
                 <li className="hover:text-white cursor-pointer">Features</li>
                 <li className="hover:text-white cursor-pointer">Pricing</li>
                 <li className="hover:text-white cursor-pointer">Reviews</li>
@@ -64,7 +64,7 @@ const Footer = () => {
             {/* COMPANY */}
             <div>
               <h4 className="text-lime-400 font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-gray-200">
+              <ul className="space-y-3 text-sm text-gray-300">
                 <li className="hover:text-white cursor-pointer">About</li>
                 <li className="hover:text-white cursor-pointer">Contact us</li>
               </ul>
@@ -73,7 +73,7 @@ const Footer = () => {
             {/* SUPPORT */}
             <div>
               <h4 className="text-lime-400 font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-200">
+              <ul className="space-y-3 text-sm text-gray-300">
                 <li className="hover:text-white cursor-pointer">Help center</li>
                 <li className="hover:text-white cursor-pointer">
                   Server status
@@ -85,163 +85,93 @@ const Footer = () => {
             </div>
 
             {/* CONTACT */}
-            <div className="">
+            <div>
               <h4 className="text-lime-400 font-semibold mb-4">Contact Us</h4>
-              <ul className="space-y-2 text-sm text-gray-200">
-                <li className="flex items-center gap-2">
-                  {/* <FaEnvelope className="text-lime-400" /> */}
+
+              <ul className="space-y-3 text-sm text-gray-300">
+
+                {/* EMAIL */}
+                <li className="flex items-center gap-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
                     height="20"
-                    viewBox="0 0 20 20"
+                    viewBox="0 0 16 16"
+                    className="flex-shrink-0"
                   >
                     <g fill="none">
-                      <path
-                        fill="#367af2"
-                        d="M2.757 6.071A.5.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8a.5.5 0 0 0-.757-.429L10 10.417z"
-                      />
-                      <path
-                        fill="url(#SVGj5XpYbUo)"
-                        d="M2.757 6.071A.5.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8a.5.5 0 0 0-.757-.429L10 10.417z"
-                      />
-                      <path
-                        fill="url(#SVGygvXycNq)"
-                        d="M2.757 6.071A.5.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8a.5.5 0 0 0-.757-.429L10 10.417z"
-                      />
-                      <path
-                        fill="url(#SVGt4VFbc3v)"
-                        fillOpacity="0.75"
-                        d="M2.757 6.071A.5.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8a.5.5 0 0 0-.757-.429L10 10.417z"
-                      />
-                      <path
-                        fill="url(#SVGdPNFZbrR)"
-                        fillOpacity="0.7"
-                        d="M2.757 6.071A.5.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8a.5.5 0 0 0-.757-.429L10 10.417z"
-                      />
-                      <path
-                        fill="url(#SVGqtSPpd1q)"
-                        d="M4.5 4A2.5 2.5 0 0 0 2 6.5v.6a.5.5 0 0 0 .247.431l7.5 4.4a.5.5 0 0 0 .506 0l7.5-4.4A.5.5 0 0 0 18 7.1v-.6A2.5 2.5 0 0 0 15.5 4z"
-                      />
-                      <defs>
-                        <linearGradient
-                          id="SVGj5XpYbUo"
-                          x1="12.031"
-                          x2="16.923"
-                          y1="8.156"
-                          y2="16.616"
-                          gradientUnits="userSpaceOnUse"
-                        >
-                          <stop
-                            offset=".228"
-                            stopColor="#0094f0"
-                            stopOpacity="0"
-                          />
-                          <stop offset=".431" stopColor="#0094f0" />
-                        </linearGradient>
-                        <linearGradient
-                          id="SVGygvXycNq"
-                          x1="7.714"
-                          x2="2.272"
-                          y1="7.158"
-                          y2="17.134"
-                          gradientUnits="userSpaceOnUse"
-                        >
-                          <stop
-                            offset=".228"
-                            stopColor="#0094f0"
-                            stopOpacity="0"
-                          />
-                          <stop offset=".431" stopColor="#0094f0" />
-                        </linearGradient>
-                        <linearGradient
-                          id="SVGt4VFbc3v"
-                          x1="14.219"
-                          x2="15.057"
-                          y1="12.563"
-                          y2="17.991"
-                          gradientUnits="userSpaceOnUse"
-                        >
-                          <stop stopColor="#2764e7" stopOpacity="0" />
-                          <stop offset="1" stopColor="#2764e7" />
-                        </linearGradient>
-                        <linearGradient
-                          id="SVGdPNFZbrR"
-                          x1="12.476"
-                          x2="14.006"
-                          y1="7.351"
-                          y2="18.41"
-                          gradientUnits="userSpaceOnUse"
-                        >
-                          <stop
-                            offset=".533"
-                            stopColor="#ff6ce8"
-                            stopOpacity="0"
-                          />
-                          <stop offset="1" stopColor="#ff6ce8" />
-                        </linearGradient>
-                        <linearGradient
-                          id="SVGqtSPpd1q"
-                          x1="6.753"
-                          x2="12.394"
-                          y1="1.507"
-                          y2="15.118"
-                          gradientUnits="userSpaceOnUse"
-                        >
-                          <stop stopColor="#6ce0ff" />
-                          <stop offset=".462" stopColor="#29c3ff" />
-                          <stop offset="1" stopColor="#4894fe" />
-                        </linearGradient>
-                      </defs>
+                      <path fill="#367af2" d="M14 5H2v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2z" />
+                      <path fill="#4894fe" d="M4 3a2 2 0 0 0-2 2v.84l5.763 3.103a.5.5 0 0 0 .474 0L14 5.84V5a2 2 0 0 0-2-2z" />
                     </g>
                   </svg>
-                  contact@yaritrip.com
+                  <span>info.yaritrip@gmail.com</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  {/* <FaPhoneAlt className="text-lime-400" /> */}
-                  (+91) 98765-43210
+
+                {/* PHONE */}
+                <li className="flex items-center gap-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    className="flex-shrink-0"
+                  >
+                    <path
+                      fill="#367af2"
+                      d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.98.98 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02c-.37-1.11-.56-2.3-.56-3.53c0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99C3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99"
+                    />
+                  </svg>
+                  <span className="text-[12px]">(+91) 91171-77979</span>
                 </li>
-                <li>Support Hours: 24/7</li>
+
+                {/* SUPPORT */}
+                <li className="flex items-center gap-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    className="flex-shrink-0"
+                  >
+                    <path
+                      fill="#367af2"
+                      d="M11 21v-2h8v-7.1q0-2.925-2.037-4.962T12 4.9T7.038 6.938T5 11.9V18H4q-.825 0-1.412-.587T2 16v-2q0-.525.263-.987T3 12.275l.075-1.325q.2-1.7.988-3.15t1.975-2.525T8.762 3.6T12 3t3.225.6t2.725 1.663t1.975 2.512t1 3.15l.075 1.3q.475.225.738.675t.262.95v2.3q0 .5-.262.95t-.738.675V19q0 .825-.587 1.413T19 21z"
+                    />
+                  </svg>
+                  <span>Support Hours: 24/7</span>
+                </li>
+
               </ul>
             </div>
 
-            {/* SUITCASE IMAGE */}
+            {/* IMAGE */}
             <div className="hidden lg:flex justify-end items-end">
               <img
                 src={suitcaseImg}
                 alt="Travel suitcase"
-                className="h-48 object-contain"
+                className="h-44 object-contain"
               />
             </div>
           </div>
 
           {/* DIVIDER */}
-          <div className="border-t border-white/20 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-300 gap-4">
+          <div className="border-t border-white/20 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-300">
+
             <span>© 2026 yaritrip. All rights reserved.</span>
 
-            <div className="flex gap-4">
-              <NavLink
-                to="/terms-conditions"
-                className="hover:text-white cursor-pointer"
-              >
+            <div className="flex gap-6 flex-wrap justify-center">
+              <NavLink to="/terms-conditions" className="hover:text-white">
                 Terms & Conditions
               </NavLink>
-
-              <NavLink
-                to="/privacy-policy"
-                className="hover:text-white cursor-pointer"
-              >
+              <NavLink to="/privacy-policy" className="hover:text-white">
                 Privacy Policy
               </NavLink>
-
-              <NavLink
-                to="/refund-policy"
-                className="hover:text-white cursor-pointer"
-              >
+              <NavLink to="/refund-policy" className="hover:text-white">
                 Refund Policy
               </NavLink>
             </div>
           </div>
+
         </div>
       </div>
     </footer>
