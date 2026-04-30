@@ -71,9 +71,9 @@ const AppRoutes = () => {
         }
       />
 
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/refund" element={<Refund />} />
+      <Route path="/Privacy-Policy" element={<Privacy />} />
+      <Route path="/Terms&Conditions" element={<Terms />} />
+      <Route path="/Refund-Policy" element={<Refund />} />
 
     </Routes>
   );

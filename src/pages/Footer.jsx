@@ -221,21 +221,21 @@ const Footer = () => {
 
             <div className="flex gap-4">
               <NavLink
-                to="/terms"
+                to="/Terms&Conditions"
                 className="hover:text-white cursor-pointer"
               >
                 Terms & Conditions
               </NavLink>
 
               <NavLink
-                to="/privacy"
+                to="/Privacy-Policy"
                 className="hover:text-white cursor-pointer"
               >
                 Privacy Policy
               </NavLink>
 
               <NavLink
-                to="/refund"
+                to="/Refund-Policy"
                 className="hover:text-white cursor-pointer"
               >
                 Refund Policy
