@@ -6,6 +6,8 @@ import Signup from "../pages/Signup";
 import UserProfile from "../pages/UserProfile";
 import ResultsPage from "../pages/Results";
 import AttractionsDetails from "../pages/AttractionsDetails";
+import About from "../pages/About";
+import Contact from "../pages/Contact";
 
 /* OLD Results-Based Package Page */
 import PackageDetails from "../pages/PackageDetails";
@@ -37,6 +39,8 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} />
       <Route path="/user-profile" element={<UserProfile />} />
       <Route path="/results" element={<ResultsPage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
 
       {/* ================= OLD PACKAGE FLOW (Results Page) ================= */}
       <Route path="/package/:id" element={<PackageDetails />} />

@@ -65,8 +65,22 @@ const Footer = () => {
             <div>
               <h4 className="text-lime-400 font-semibold mb-4">Company</h4>
               <ul className="space-y-3 text-sm text-gray-300">
-                <li className="hover:text-white cursor-pointer">About</li>
-                <li className="hover:text-white cursor-pointer">Contact us</li>
+                <li>
+                  <NavLink
+                    to="/about"
+                    className="hover:text-white cursor-pointer"
+                  >
+                    About
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/contact"
+                    className="hover:text-white cursor-pointer"
+                  >
+                    Contact
+                  </NavLink>
+                </li>
               </ul>
             </div>
 
